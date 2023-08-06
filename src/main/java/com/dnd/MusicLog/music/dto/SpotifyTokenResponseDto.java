@@ -1,4 +1,4 @@
-package com.dnd.MusicLog.music.service.dto;
+package com.dnd.MusicLog.music.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

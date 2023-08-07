@@ -16,7 +16,7 @@ public class User {
     private Long id;
 
     @Column(name = "oauth_id", nullable = false)
-    private Long oauth_id;
+    private Long oauthId;
 
     private String email;
 
@@ -24,18 +24,18 @@ public class User {
     private String nickname;
 
     @Column(name = "profile_url", nullable = false)
-    private String profile_url;
+    private String profileUrl;
 
     @Column(name = "oauth_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private OAuthType oauth_type;
+    private OAuthType oauthType;
 
     @Builder
-    public User(Long oauth_id, String email, String nickname, String profile_url, OAuthType oauth_type) {
-        this.oauth_id = oauth_id;
+    public User(Long oauthId, String email, String nickname, String profileUrl, OAuthType oauthType) {
+        this.oauthId = oauthId;
         this.email = email;
         this.nickname = nickname;
-        this.profile_url = profile_url;
-        this.oauth_type = oauth_type;
+        this.profileUrl = profileUrl;
+        this.oauthType = oauthType;
     }
 }

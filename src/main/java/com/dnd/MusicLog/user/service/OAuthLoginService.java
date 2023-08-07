@@ -28,7 +28,7 @@ public class OAuthLoginService {
     }
 
     private Long validateUserByEmail(OAuthInfoResponse oAuthInfoResponse) {
-        Optional<User> userOptional = userRepository.findByEmail(oAuthInfoResponse.getEmail());
+        Optional<User> userOptional = userRepository.findByOauthId(oAuthInfoResponse.getOAuthId());
 
         if (userOptional.isPresent()) {
             return userOptional.get().getId();

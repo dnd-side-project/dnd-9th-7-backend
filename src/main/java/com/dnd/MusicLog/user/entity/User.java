@@ -1,5 +1,6 @@
 package com.dnd.MusicLog.user.entity;
 
+import com.dnd.MusicLog.user.enums.OAuthType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

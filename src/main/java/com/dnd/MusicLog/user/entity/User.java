@@ -1,5 +1,6 @@
 package com.dnd.MusicLog.user.entity;
 
+import com.dnd.MusicLog.global.common.BaseTimeEntity;
 import com.dnd.MusicLog.user.enums.OAuthType;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

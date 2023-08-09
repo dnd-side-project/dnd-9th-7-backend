@@ -30,8 +30,8 @@ public class KakaoInfoResponse implements OAuthInfoResponse {
     }
 
     @Override
-    public Long getOAuthId() {
-        return oauthId;
+    public String getOAuthId() {
+        return String.valueOf(oauthId);
     }
 
     @Override

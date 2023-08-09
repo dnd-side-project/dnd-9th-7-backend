@@ -4,7 +4,7 @@ import com.dnd.MusicLog.user.enums.OAuthType;
 
 public interface OAuthInfoResponse {
 
-    Long getOAuthId();
+    String getOAuthId();
     String getEmail();
     String getNickname();
     String getProfileUrl();

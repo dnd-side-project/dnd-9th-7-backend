@@ -1,7 +1,7 @@
 package com.dnd.MusicLog.user.service;
 
 import com.dnd.MusicLog.global.jwt.AuthTokensGenerator;
-import com.dnd.MusicLog.user.dto.AuthTokensResponseDto;
+import com.dnd.MusicLog.global.jwt.dto.AuthTokensResponseDto;
 import com.dnd.MusicLog.user.oauth.OAuthInfoResponse;
 import com.dnd.MusicLog.user.oauth.OAuthLoginParams;
 import com.dnd.MusicLog.user.entity.User;

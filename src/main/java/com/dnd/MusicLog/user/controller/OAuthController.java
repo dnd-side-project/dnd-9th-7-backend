@@ -1,6 +1,6 @@
 package com.dnd.MusicLog.user.controller;
 
-import com.dnd.MusicLog.user.dto.AuthTokensResponseDto;
+import com.dnd.MusicLog.global.jwt.dto.AuthTokensResponseDto;
 import com.dnd.MusicLog.user.oauth.KakaoLoginParams;
 import com.dnd.MusicLog.user.service.OAuthLoginService;
 import lombok.RequiredArgsConstructor;

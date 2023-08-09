@@ -1,4 +1,4 @@
-package com.dnd.MusicLog.user.dto;
+package com.dnd.MusicLog.global.jwt.dto;
 
 import lombok.*;
 

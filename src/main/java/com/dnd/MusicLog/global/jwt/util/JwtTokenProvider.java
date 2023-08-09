@@ -1,4 +1,4 @@
-package com.dnd.MusicLog.global.jwt;
+package com.dnd.MusicLog.global.jwt.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

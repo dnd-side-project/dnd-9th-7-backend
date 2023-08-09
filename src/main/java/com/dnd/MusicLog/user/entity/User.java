@@ -14,10 +14,10 @@ public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @Column(name = "oauth_id", nullable = false)
-    private Long oauthId;
+    private long oauthId;
 
     private String email;
 
@@ -32,7 +32,7 @@ public class User extends BaseTimeEntity {
     private OAuthType oauthType;
 
     @Builder
-    public User(Long oauthId, String email, String nickname, String profileUrl, OAuthType oauthType) {
+    public User(long oauthId, String email, String nickname, String profileUrl, OAuthType oauthType) {
         this.oauthId = oauthId;
         this.email = email;
         this.nickname = nickname;

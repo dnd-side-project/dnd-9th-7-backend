@@ -1,19 +1,17 @@
-package com.dnd.MusicLog.global.jwt;
+package com.dnd.MusicLog.global.jwt.service;
 
-import com.dnd.MusicLog.user.dto.AuthTokensResponseDto;
+import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
+import com.dnd.MusicLog.global.jwt.dto.AuthTokensResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+import static com.dnd.MusicLog.global.jwt.util.JwtProperties.*;
+
 @Component
 @RequiredArgsConstructor
-public class AuthTokensGenerator {
-    private static final String BEARER_TYPE = "Bearer";
-    private static final String ACCESS_TOKEN_TYPE = "access";
-    private static final String REFRESH_TOKEN_TYPE = "refresh";
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;            // 30분
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
+public class AuthTokensGeneratorService {
 
     private final JwtTokenProvider jwtTokenProvider;
 

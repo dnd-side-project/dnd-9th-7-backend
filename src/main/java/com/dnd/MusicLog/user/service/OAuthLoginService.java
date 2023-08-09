@@ -24,7 +24,7 @@ public class OAuthLoginService {
     public AuthTokensResponseDto loginUser(OAuthLoginParams params) {
         OAuthInfoResponse oAuthInfoResponse = requestOAuthInfoService.request(params);
         Long userId = validateUserByEmail(oAuthInfoResponse);
-        return authTokensGeneratorService.generate(userId);
+        return authTokensGeneratorService.generateAuthToken(userId);
     }
 
     private Long validateUserByEmail(OAuthInfoResponse oAuthInfoResponse) {

@@ -15,7 +15,7 @@ public class AuthTokensGeneratorService {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthTokensResponseDto generate(Long userId) {
+    public AuthTokensResponseDto generateAuthToken(Long userId) {
         long now = (new Date()).getTime();
         Date accessTokenExpiredAt = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
         Date refreshTokenExpiredAt = new Date(now + REFRESH_TOKEN_EXPIRE_TIME);
@@ -27,11 +27,7 @@ public class AuthTokensGeneratorService {
         return AuthTokensResponseDto.of(accessToken, refreshToken, BEARER_TYPE, ACCESS_TOKEN_EXPIRE_TIME / 1000L);
     }
 
-    public Long extractUserId(String token, String tokenType) {
-        return Long.valueOf(jwtTokenProvider.extractSubject(token, tokenType));
-    }
-
-    public String extractTokenType(String token, String tokenType) {
-        return String.valueOf(jwtTokenProvider.extractTokenType(token, tokenType));
-    }
+//    public String extractTokenType(String token, String tokenType) {
+//        return String.valueOf(jwtTokenProvider.extractTokenType(token, tokenType));
+//    }
 }

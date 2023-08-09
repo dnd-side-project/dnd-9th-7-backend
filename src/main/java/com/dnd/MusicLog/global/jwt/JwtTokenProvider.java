@@ -14,35 +14,59 @@ import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-    private final Key key;
+    private final Key accessSecretKey;
+    private final Key refreshSecretKey;
 
-    public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey) {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+    public JwtTokenProvider(@Value("${jwt.access-secret-key}") String accessSecretKey,
+                            @Value("${jwt.refresh-secret-key}") String refreshSecretKey) {
+        byte[] accessKeyBytes = Decoders.BASE64.decode(accessSecretKey);
+        byte[] refreshKeyBytes = Decoders.BASE64.decode(refreshSecretKey);
+        this.accessSecretKey = Keys.hmacShaKeyFor(accessKeyBytes);
+        this.refreshSecretKey = Keys.hmacShaKeyFor(refreshKeyBytes);
     }
 
-    public String generate(String subject, Date expiredAt) {
+    public String generate(String subject, Date expiredAt, String tokenType) {
+
+        Key key = checkTokenType(tokenType);
+
         return Jwts.builder()
             .setSubject(subject)
+            .claim("tokenType", tokenType)
             .setExpiration(expiredAt)
             .signWith(key, SignatureAlgorithm.HS512)
             .compact();
     }
 
-    public String extractSubject(String accessToken) {
-        Claims claims = parseClaims(accessToken);
+    public String extractSubject(String token, String tokenType) {
+        Claims claims = parseClaims(token, tokenType);
         return claims.getSubject();
     }
 
-    private Claims parseClaims(String accessToken) {
+    public String extractTokenType(String token, String tokenType) {
+        Claims claims = parseClaims(token, tokenType);
+        return claims.get("tokenType", String.class);
+    }
+
+    private Claims parseClaims(String token, String tokenType) {
+
+        Key key = checkTokenType(tokenType);
+
         try {
             return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
-                .parseClaimsJws(accessToken)
+                .parseClaimsJws(token)
                 .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
+        }
+    }
+
+    private Key checkTokenType(String tokenType) {
+        if (tokenType == "access") {
+            return accessSecretKey;
+        } else {
+            return refreshSecretKey;
         }
     }
 }

@@ -63,7 +63,7 @@ public class JwtTokenProvider {
     }
 
     private Key checkTokenType(String tokenType) {
-        if (tokenType == "access") {
+        if (tokenType.equals("access")) {
             return accessSecretKey;
         } else {
             return refreshSecretKey;

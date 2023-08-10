@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,7 @@ public class JwtTokenProvider {
         this.refreshSecretKey = Keys.hmacShaKeyFor(refreshKeyBytes);
     }
 
-    public String generate(String subject, Date expiredAt, String tokenType) {
+    public String generateToken(String subject, Date expiredAt, String tokenType) {
 
         Key key = checkTokenType(tokenType);
 
@@ -37,14 +38,21 @@ public class JwtTokenProvider {
             .compact();
     }
 
+    public String resolveToken(HttpServletRequest request) {
+        String bearer = request.getHeader(JwtProperties.HEADER);
+        return bearer;
+    }
+
+    public String parseToken(String bearerToken) {
+        if (bearerToken != null && bearerToken.startsWith(JwtProperties.BEARER_TYPE))
+            return bearerToken.replace(JwtProperties.BEARER_TYPE, "");
+
+        return null;
+    }
+
     public String extractSubject(String token, String tokenType) {
         Claims claims = parseClaims(token, tokenType);
         return claims.getSubject();
-    }
-
-    public String extractTokenType(String token, String tokenType) {
-        Claims claims = parseClaims(token, tokenType);
-        return claims.get("tokenType", String.class);
     }
 
     private Claims parseClaims(String token, String tokenType) {

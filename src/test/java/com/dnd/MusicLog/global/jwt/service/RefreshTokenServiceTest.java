@@ -52,8 +52,7 @@ class RefreshTokenServiceTest {
         String refreshToken = jwtTokenProvider.generateToken(String.valueOf(userId), refreshTokenExpiredAt,
             JwtProperties.REFRESH_TOKEN_TYPE);
 
-        AccessTokenResponseDto accessTokenResponseDto = refreshTokenService.regenerateAccessToken(refreshToken,
-            JwtProperties.REFRESH_TOKEN_TYPE);
+        AccessTokenResponseDto accessTokenResponseDto = refreshTokenService.regenerateAccessToken(refreshToken);
 
         org.assertj.core.api.Assertions.assertThat(accessTokenResponseDto.getAccessToken()).isNotNull();
     }
@@ -80,7 +79,7 @@ class RefreshTokenServiceTest {
             JwtProperties.REFRESH_TOKEN_TYPE);
 
         Assertions.assertThrows(BusinessLogicException.class, () -> {
-            refreshTokenService.regenerateAccessToken(refreshToken, JwtProperties.REFRESH_TOKEN_TYPE);
+            refreshTokenService.regenerateAccessToken(refreshToken);
         });
     }
 }

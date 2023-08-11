@@ -35,8 +35,7 @@ public class OAuthController extends BaseController {
     @PostMapping("/token")
     public ResponseEntity<BaseResponse<AccessTokenResponseDto>> regenerateAccessToken(@RequestBody RefreshToken refreshToken) {
 
-        AccessTokenResponseDto responseDto = refreshTokenService.regenerateAccessToken(refreshToken.refreshToken(),
-            JwtProperties.REFRESH_TOKEN_TYPE);
+        AccessTokenResponseDto responseDto = refreshTokenService.regenerateAccessToken(refreshToken.refreshToken());
         return createResponseEntity(HttpStatus.OK, "액세스 토큰 재발급 완료", responseDto);
 
     }

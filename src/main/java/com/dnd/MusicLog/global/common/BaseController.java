@@ -5,10 +5,10 @@ import org.springframework.http.ResponseEntity;
 
 public abstract class BaseController {
 
-    protected <T> ResponseEntity<BaseResponse> createResponseEntity(HttpStatus httpStatus, String message, T data) {
+    protected <T> ResponseEntity<BaseResponse<T>> createResponseEntity(HttpStatus httpStatus, String message, T data) {
         return ResponseEntity
             .status(httpStatus)
-            .body(BaseResponse.builder()
+            .body(BaseResponse.<T>builder()
                 .status(httpStatus.value())
                 .message(message)
                 .data(data)

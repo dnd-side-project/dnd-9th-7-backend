@@ -1,7 +1,7 @@
 package com.dnd.MusicLog.user.service;
 
-import com.dnd.MusicLog.global.jwt.AuthTokensGenerator;
-import com.dnd.MusicLog.user.dto.AuthTokensResponseDto;
+import com.dnd.MusicLog.global.jwt.service.AuthTokensGeneratorService;
+import com.dnd.MusicLog.global.jwt.dto.AuthTokensResponseDto;
 import com.dnd.MusicLog.user.oauth.OAuthInfoResponse;
 import com.dnd.MusicLog.user.oauth.OAuthLoginParams;
 import com.dnd.MusicLog.user.entity.User;
@@ -17,14 +17,14 @@ import java.util.Optional;
 public class OAuthLoginService {
 
     private final UserRepository userRepository;
-    private final AuthTokensGenerator authTokensGenerator;
+    private final AuthTokensGeneratorService authTokensGeneratorService;
     private final RequestOAuthInfoService requestOAuthInfoService;
 
     @Transactional
     public AuthTokensResponseDto loginUser(OAuthLoginParams params) {
         OAuthInfoResponse oAuthInfoResponse = requestOAuthInfoService.request(params);
         Long userId = validateUserByEmail(oAuthInfoResponse);
-        return authTokensGenerator.generate(userId);
+        return authTokensGeneratorService.generateAuthToken(userId);
     }
 
     private Long validateUserByEmail(OAuthInfoResponse oAuthInfoResponse) {

@@ -1,11 +1,14 @@
-package com.dnd.MusicLog.global.jwt;
+package com.dnd.MusicLog.global.jwt.util;
 
+import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
+import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +28,7 @@ public class JwtTokenProvider {
         this.refreshSecretKey = Keys.hmacShaKeyFor(refreshKeyBytes);
     }
 
-    public String generate(String subject, Date expiredAt, String tokenType) {
+    public String generateToken(String subject, Date expiredAt, String tokenType) {
 
         Key key = checkTokenType(tokenType);
 
@@ -37,28 +40,44 @@ public class JwtTokenProvider {
             .compact();
     }
 
+    public String resolveToken(HttpServletRequest request) {
+        String bearer = request.getHeader(JwtProperties.HEADER);
+        return bearer;
+    }
+
+    public String parseToken(String bearerToken) {
+        if (bearerToken != null && bearerToken.startsWith(JwtProperties.BEARER_TYPE))
+            return bearerToken.replace(JwtProperties.BEARER_TYPE, "");
+
+        return null;
+    }
+
     public String extractSubject(String token, String tokenType) {
         Claims claims = parseClaims(token, tokenType);
         return claims.getSubject();
     }
 
-    public String extractTokenType(String token, String tokenType) {
-        Claims claims = parseClaims(token, tokenType);
-        return claims.get("tokenType", String.class);
+private Claims parseClaims(String token, String tokenType) {
+    Key key = checkTokenType(tokenType);
+
+    try {
+        return Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+    } catch (ExpiredJwtException e) {
+        throw new BusinessLogicException(getErrorCode(tokenType, true));
+    } catch (Exception e) {
+        throw new BusinessLogicException(getErrorCode(tokenType, false));
     }
+}
 
-    private Claims parseClaims(String token, String tokenType) {
-
-        Key key = checkTokenType(tokenType);
-
-        try {
-            return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
+    private ErrorCode getErrorCode(String tokenType, boolean isExpired) {
+        if (isExpired) {
+            return tokenType.equals(JwtProperties.ACCESS_TOKEN_TYPE) ? ErrorCode.EXPIRED_ACCESS_TOKEN : ErrorCode.EXPIRED_REFRESH_TOKEN;
+        } else {
+            return tokenType.equals(JwtProperties.ACCESS_TOKEN_TYPE) ? ErrorCode.INVALID_ACCESS_TOKEN : ErrorCode.INVALID_REFRESH_TOKEN;
         }
     }
 

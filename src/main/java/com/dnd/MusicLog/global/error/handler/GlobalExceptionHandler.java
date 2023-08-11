@@ -9,9 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     // Valid & Validated annotation 과정에서의 오류 핸들링.
@@ -19,7 +20,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> MethodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
         log.error("MethodArgumentNotValidException handle!!", e);
         ErrorResponse errorResponse = buildErrorResponse(ErrorCode.BAD_REQUEST);
-        HttpStatus httpStatus = HttpStatus.valueOf(String.valueOf(ErrorCode.BAD_REQUEST.getStatus()));
+        HttpStatus httpStatus = ErrorCode.BAD_REQUEST.getStatus();
         return buildResponseEntity(errorResponse, httpStatus);
     }
 
@@ -29,7 +30,7 @@ public class GlobalExceptionHandler {
         log.error("BusinessLoginException handle!!", e);
         ErrorCode errorCode = e.getErrorCode();
         ErrorResponse errorResponse = buildErrorResponse(errorCode);
-        HttpStatus httpStatus = HttpStatus.valueOf(String.valueOf(errorCode.getStatus()));
+        HttpStatus httpStatus = errorCode.getStatus();
         return buildResponseEntity(errorResponse, httpStatus);
     }
 
@@ -38,7 +39,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> MethodArgumentNotValidExceptionHandler(Exception e) {
         log.error("Exception handle!!", e);
         ErrorResponse errorResponse = buildErrorResponse(ErrorCode.SERVER_ERROR);
-        HttpStatus httpStatus = HttpStatus.valueOf(String.valueOf(ErrorCode.SERVER_ERROR.getStatus()));
+        HttpStatus httpStatus = ErrorCode.SERVER_ERROR.getStatus();
         return buildResponseEntity(errorResponse, httpStatus);
     }
 

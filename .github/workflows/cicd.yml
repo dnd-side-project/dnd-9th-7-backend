@@ -29,7 +29,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         
-    ## git ignore에 등록된 application.yml 파일 생성해주기
+    # git ignore에 등록된 application.yml 파일 생성해주기
     - name: make application.yml
       run: |
         cd ./src/main/resources

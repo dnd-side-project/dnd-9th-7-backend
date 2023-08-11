@@ -24,8 +24,13 @@ public class AuthTokensGeneratorService {
         String accessToken = jwtTokenProvider.generateToken(subject, accessTokenExpiredAt, JwtProperties.ACCESS_TOKEN_TYPE);
         String refreshToken = jwtTokenProvider.generateToken(subject, refreshTokenExpiredAt, JwtProperties.REFRESH_TOKEN_TYPE);
 
-        return AuthTokensResponseDto.of(accessToken, refreshToken, JwtProperties.BEARER_TYPE,
-            JwtProperties.ACCESS_TOKEN_EXPIRE_TIME / 1000L);
+        return AuthTokensResponseDto.builder()
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .grantType(JwtProperties.BEARER_TYPE)
+            .expiresIn(JwtProperties.ACCESS_TOKEN_EXPIRE_TIME / 1000L)
+            .build();
+
     }
 
 }

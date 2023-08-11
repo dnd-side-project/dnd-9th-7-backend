@@ -28,6 +28,14 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+        
+    ## git ignore에 등록된 application.yml 파일 생성해주기
+    - name: make application.properties
+      run: |
+        cd ./src/main/resources
+        touch ./application.yml
+        echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
+      shell: bash
           
     # gradle build
     - name: Build with Gradle

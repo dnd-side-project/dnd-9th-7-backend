@@ -1,5 +1,7 @@
 package com.dnd.MusicLog.global.jwt.util;
 
+import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
+import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -55,18 +57,27 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    private Claims parseClaims(String token, String tokenType) {
+private Claims parseClaims(String token, String tokenType) {
+    Key key = checkTokenType(tokenType);
 
-        Key key = checkTokenType(tokenType);
+    try {
+        return Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+    } catch (ExpiredJwtException e) {
+        throw new BusinessLogicException(getErrorCode(tokenType, true));
+    } catch (Exception e) {
+        throw new BusinessLogicException(getErrorCode(tokenType, false));
+    }
+}
 
-        try {
-            return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
+    private ErrorCode getErrorCode(String tokenType, boolean isExpired) {
+        if (isExpired) {
+            return tokenType.equals(JwtProperties.ACCESS_TOKEN_TYPE) ? ErrorCode.EXPIRED_ACCESS_TOKEN : ErrorCode.EXPIRED_REFRESH_TOKEN;
+        } else {
+            return tokenType.equals(JwtProperties.ACCESS_TOKEN_TYPE) ? ErrorCode.INVALID_ACCESS_TOKEN : ErrorCode.INVALID_REFRESH_TOKEN;
         }
     }
 

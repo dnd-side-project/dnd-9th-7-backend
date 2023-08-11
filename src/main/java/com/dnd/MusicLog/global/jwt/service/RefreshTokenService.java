@@ -30,7 +30,9 @@ public class RefreshTokenService {
 
         String accessToken = jwtTokenProvider.generateToken(userId, accessTokenExpiredAt, JwtProperties.ACCESS_TOKEN_TYPE);
 
-        return AccessTokenResponseDto.of(accessToken);
+        return AccessTokenResponseDto.builder()
+            .accessToken(accessToken)
+            .build();
 
     }
 }

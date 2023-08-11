@@ -33,7 +33,7 @@ class RefreshTokenServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("RefreshToken 재발급 성공 테스트")
+    @DisplayName("AccessToken 재발급 성공 테스트")
     void refreshTokenSuccessTest() {
 
         long now = (new Date()).getTime();
@@ -60,7 +60,7 @@ class RefreshTokenServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("RefreshToken 재발급 실패 테스트")
+    @DisplayName("AccessToken 재발급 실패 테스트")
     void refreshTokenFailTest() {
 
         long now = (new Date()).getTime();

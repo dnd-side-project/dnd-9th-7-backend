@@ -15,12 +15,12 @@ public class LogController extends BaseController {
 
     private final SearchYoutubeVideosService searchYoutubeVideosService;
 
-    @GetMapping("/youtube/v3/search")
+    @GetMapping("/api/youtube")
     public ResponseEntity<BaseResponse<YoutubeVideoListResponseDto>> searchVideos(@RequestParam String query,
                                                                                   @RequestParam(required = false) String pageToken) {
 
         YoutubeVideoListResponseDto responseDto = searchYoutubeVideosService.searchYoutubeVideos(query, pageToken);
-        return createResponseEntity(HttpStatus.OK, "로그인 완료", responseDto);
+        return createResponseEntity(HttpStatus.OK, "유튜브 영상 조회 완료", responseDto);
 
     }
 }

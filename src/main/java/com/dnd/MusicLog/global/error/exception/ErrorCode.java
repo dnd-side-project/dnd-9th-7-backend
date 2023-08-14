@@ -12,6 +12,8 @@ public enum ErrorCode {
 
     // 400 Bad Request
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+    BAD_REQUEST_FILENAME(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일 이름입니다."),
+    BAD_REQUEST_MULTIPART(HttpStatus.BAD_REQUEST, "파일 최대 개수를 초과하였습니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "리소스 접근 권한이 없습니다."),

@@ -2,7 +2,6 @@ package com.dnd.MusicLog.music.controller;
 
 import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
-import com.dnd.MusicLog.global.jwt.util.JwtProperties;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto;
 import com.dnd.MusicLog.music.dto.SaveMusicResponseDto;
@@ -38,7 +37,7 @@ public class MusicController extends BaseController {
     public ResponseEntity<BaseResponse<SaveMusicResponseDto>> saveMusic(
         @RequestHeader(name = "Authorization") String token,
         @RequestBody SaveMusicRequestDto saveMusicRequestDto) {
-        String subject = jwtTokenProvider.extractSubject(token, JwtProperties.ACCESS_TOKEN_TYPE);
+        String subject = jwtTokenProvider.extractAccessTokenSubject(token);
         long userId = Long.parseLong(subject);
 
         SaveMusicResponseDto responseDto = musicService.saveMusic(

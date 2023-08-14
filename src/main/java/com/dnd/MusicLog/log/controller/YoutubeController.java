@@ -27,7 +27,7 @@ public class YoutubeController extends BaseController {
 
         jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         YoutubeVideoListResponseDto responseDto = searchYoutubeVideosService.searchYoutubeVideos(query, pageToken);
-        return createResponseEntity(HttpStatus.OK, "유튜브 영상 조회 완료", responseDto);
+        return createBaseResponse(HttpStatus.OK, "유튜브 영상 조회 완료", responseDto);
 
     }
 }

@@ -40,38 +40,39 @@ public class JwtTokenProvider {
             .compact();
     }
 
-    public String resolveToken(HttpServletRequest request) {
-        String bearer = request.getHeader(JwtProperties.HEADER);
-        return bearer;
+    public String extractAccessTokenSubject(String bearerToken) {
+
+        if (bearerToken == null || !bearerToken.startsWith(JwtProperties.BEARER_TYPE)) {
+            throw new BusinessLogicException(ErrorCode.INVALID_ACCESS_TOKEN);
+        }
+
+        String accessToken = bearerToken.replace(JwtProperties.BEARER_TYPE, "");
+
+        Claims claims = parseClaims(accessToken, JwtProperties.ACCESS_TOKEN_TYPE);
+        return claims.getSubject();
+
     }
 
-    public String parseToken(String bearerToken) {
-        if (bearerToken != null && bearerToken.startsWith(JwtProperties.BEARER_TYPE))
-            return bearerToken.replace(JwtProperties.BEARER_TYPE, "");
-
-        return null;
-    }
-
-    public String extractSubject(String token, String tokenType) {
-        Claims claims = parseClaims(token, tokenType);
+    public String extractRefreshTokenSubject(String refreshToken) {
+        Claims claims = parseClaims(refreshToken, JwtProperties.REFRESH_TOKEN_TYPE);
         return claims.getSubject();
     }
 
-private Claims parseClaims(String token, String tokenType) {
-    Key key = checkTokenType(tokenType);
+    private Claims parseClaims(String token, String tokenType) {
+        Key key = checkTokenType(tokenType);
 
-    try {
-        return Jwts.parserBuilder()
-            .setSigningKey(key)
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
-    } catch (ExpiredJwtException e) {
-        throw new BusinessLogicException(getErrorCode(tokenType, true));
-    } catch (Exception e) {
-        throw new BusinessLogicException(getErrorCode(tokenType, false));
+        try {
+            return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new BusinessLogicException(getErrorCode(tokenType, true));
+        } catch (Exception e) {
+            throw new BusinessLogicException(getErrorCode(tokenType, false));
+        }
     }
-}
 
     private ErrorCode getErrorCode(String tokenType, boolean isExpired) {
         if (isExpired) {

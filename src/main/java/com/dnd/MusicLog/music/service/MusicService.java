@@ -9,10 +9,13 @@ import com.dnd.MusicLog.music.dto.SpotifyTrackResponseDto;
 import com.dnd.MusicLog.music.entity.Album;
 import com.dnd.MusicLog.music.entity.Artist;
 import com.dnd.MusicLog.music.entity.Music;
+import com.dnd.MusicLog.music.entity.MusicArtistRelation;
 import com.dnd.MusicLog.music.repository.AlbumRepository;
 import com.dnd.MusicLog.music.repository.ArtistRepository;
+import com.dnd.MusicLog.music.repository.MusicArtistRelationRepository;
 import com.dnd.MusicLog.music.repository.MusicRepository;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +39,7 @@ public class MusicService {
     private final MusicRepository musicRepository;
     private final ArtistRepository artistRepository;
     private final AlbumRepository albumRepository;
+    private final MusicArtistRelationRepository musicArtistRelationRepository;
 
     @Value("${spotify.client.id}")
     private String SPOTIFY_CLIENT_ID;
@@ -62,35 +66,22 @@ public class MusicService {
         MusicRequestDto musicRequestDto,
         ArtistRequestDto[] artistRequestDto,
         AlbumRequestDto albumRequestDto) {
-
-        Music music = getOrCreateMusic(userId, musicRequestDto);
-        Artist[] artists = Arrays.stream(artistRequestDto)
-            .map(dto -> getOrCreateArtist(userId, dto))
-            .filter(Objects::nonNull)
-            .toArray(Artist[]::new);
-        Album album = getOrCreateAlbum(userId, albumRequestDto);
-
-        return SaveMusicResponseDto.builder()
-            .music(music)
-            .artists(artists)
-            .album(album)
-            .build();
-    }
-
-    private Music getOrCreateMusic(long userId, MusicRequestDto musicRequestDto) {
-        Optional<Music> musicOptional = Optional.empty();
-
-        if (musicRequestDto.custom()) {
-            musicOptional = musicRepository.findByAuthorAndUniqueId(userId, musicRequestDto.uniqueId());
-        }
-        if (!musicRequestDto.custom()) {
-            musicOptional = musicRepository.findByUniqueId(musicRequestDto.uniqueId());
-        }
+        Optional<Music> musicOptional = findMusic(userId, musicRequestDto);
 
         if (musicOptional.isPresent()) {
-            return musicOptional.get();
+            // music 기준으로 이미 정의된 음악의 경우 새로운 데이터를 생성하지 않고 기존 데이터를 반환
+            Music music = musicOptional.get();
+            List<MusicArtistRelation> relations = musicArtistRelationRepository.findAllByMusic(music);
+            Artist[] artists = relations.stream().map(MusicArtistRelation::getArtist).toArray(Artist[]::new);
+
+            return SaveMusicResponseDto.builder()
+                .music(music)
+                .artists(artists)
+                .album(music.getAlbum())
+                .build();
         }
 
+        // music 기준으로 새로운 음악의 경우 artist, album에 대해서 getOrCreate 진행 후 관계 매핑을 진행
         Music music = Music.builder()
             .name(musicRequestDto.name())
             .imageUrl(musicRequestDto.imageUrl())
@@ -100,7 +91,36 @@ public class MusicService {
             .author(musicRequestDto.custom() ? userId : null)
             .build();
 
-        return musicRepository.save(music);
+        musicRepository.save(music);
+
+        Artist[] artists = Arrays.stream(artistRequestDto)
+            .map(dto -> getOrCreateArtist(userId, dto))
+            .filter(Objects::nonNull)
+            .toArray(Artist[]::new);
+        Album album = getOrCreateAlbum(userId, albumRequestDto);
+
+        music.intoAlbum(album);
+        Arrays.stream(artists).forEach(artist -> {
+            MusicArtistRelation relation = MusicArtistRelation.builder()
+                .music(music)
+                .artist(artist)
+                .build();
+
+            musicArtistRelationRepository.save(relation);
+        });
+
+        return SaveMusicResponseDto.builder()
+            .music(music)
+            .artists(artists)
+            .album(album)
+            .build();
+    }
+
+    private Optional<Music> findMusic(long userId, MusicRequestDto musicRequestDto) {
+        if (musicRequestDto.custom()) {
+            return musicRepository.findByAuthorAndUniqueId(userId, musicRequestDto.uniqueId());
+        }
+        return musicRepository.findByUniqueId(musicRequestDto.uniqueId());
     }
 
     private Artist getOrCreateArtist(long userId, ArtistRequestDto artistRequestDto) {

@@ -23,19 +23,23 @@ public class SaveMusicResponseDto {
             music.getUniqueId(),
             music.isCustom(),
             music.getReleaseDate());
-        this.artists = Arrays.stream(artists)
-            .map(artist -> new ArtistResponse(
-                artist.getId(),
-                artist.getImageUrl(),
-                artist.getUniqueId(),
-                artist.isCustom()))
-            .toArray(ArtistResponse[]::new);
-        this.album = new AlbumResponse(
-            album.getId(),
-            album.getImageUrl(),
-            album.getUniqueId(),
-            album.isCustom(),
-            album.getReleaseDate());
+        this.artists = artists == null
+            ? new ArtistResponse[]{}
+            : Arrays.stream(artists)
+                .map(artist -> new ArtistResponse(
+                    artist.getId(),
+                    artist.getImageUrl(),
+                    artist.getUniqueId(),
+                    artist.isCustom()))
+                .toArray(ArtistResponse[]::new);
+        this.album = album == null
+            ? null
+            : new AlbumResponse(
+                album.getId(),
+                album.getImageUrl(),
+                album.getUniqueId(),
+                album.isCustom(),
+                album.getReleaseDate());
     }
 
     public record MusicResponse(

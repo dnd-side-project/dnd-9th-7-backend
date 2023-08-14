@@ -9,9 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,9 +43,6 @@ public class Music extends BaseTimeEntity {
     @ManyToOne(targetEntity = Album.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id")
     private Album album;
-
-    @OneToMany(targetEntity = MusicArtistRelation.class, fetch = FetchType.LAZY)
-    private List<MusicArtistRelation> relations = new ArrayList<>();
 
     @Builder
     public Music(String name, String imageUrl, String uniqueId, boolean custom, String releaseDate, Long author) {

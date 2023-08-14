@@ -2,6 +2,8 @@ package com.dnd.MusicLog.music.controller;
 
 import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
+import com.dnd.MusicLog.global.jwt.util.JwtProperties;
+import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto;
 import com.dnd.MusicLog.music.dto.SaveMusicResponseDto;
 import com.dnd.MusicLog.music.dto.SpotifyTrackResponseDto;
@@ -18,10 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/music")
+@RequestMapping("/api/music")
 @RestController
 public class MusicController extends BaseController {
 
+    private final JwtTokenProvider jwtTokenProvider;
     private final MusicService musicService;
 
     @GetMapping("")
@@ -33,17 +36,17 @@ public class MusicController extends BaseController {
 
     @PostMapping("")
     public ResponseEntity<BaseResponse<SaveMusicResponseDto>> saveMusic(
-        @RequestHeader(name = "Authorization") long userId,
+        @RequestHeader(name = "Authorization") String token,
         @RequestBody SaveMusicRequestDto saveMusicRequestDto) {
-        // TODO: token에서 userId를 가져오는 방법 필요. 위에서는 임시로 사용함.
+        String subject = jwtTokenProvider.extractSubject(token, JwtProperties.ACCESS_TOKEN_TYPE);
+        long userId = Long.parseLong(subject);
 
         SaveMusicResponseDto responseDto = musicService.saveMusic(
             userId,
             saveMusicRequestDto.music(),
             saveMusicRequestDto.artists(),
-            saveMusicRequestDto.albums());
+            saveMusicRequestDto.album());
 
         return createResponseEntity(HttpStatus.OK, "음악 정보 저장 완료", responseDto);
     }
-
 }

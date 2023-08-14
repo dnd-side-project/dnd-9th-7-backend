@@ -2,29 +2,39 @@ package com.dnd.MusicLog.log.controller;
 
 import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
+import com.dnd.MusicLog.global.common.SuccessResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
-import com.dnd.MusicLog.log.dto.YoutubeVideoListResponseDto;
-import com.dnd.MusicLog.log.service.SearchYoutubeVideosService;
+import com.dnd.MusicLog.log.service.ImagesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RequiredArgsConstructor
+@RequestMapping("/log")
 @RestController
 public class LogController extends BaseController {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final SearchYoutubeVideosService searchYoutubeVideosService;
+    private final ImagesService imagesService;
 
-    @GetMapping("/api/youtube")
-    public ResponseEntity<BaseResponse<YoutubeVideoListResponseDto>> searchVideos(@RequestHeader(name = "Authorization") String bearerToken,
-                                                                                  @RequestParam String query,
-                                                                                  @RequestParam(required = false) String pageToken) {
-
+    @PostMapping("/image")
+    public ResponseEntity<BaseResponse<List<String>>> uploadImages(@RequestHeader(name = "Authorization") String bearerToken,
+                                                                   @RequestPart("images") List<MultipartFile> multipartFile) {
         jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        YoutubeVideoListResponseDto responseDto = searchYoutubeVideosService.searchYoutubeVideos(query, pageToken);
-        return createResponseEntity(HttpStatus.OK, "유튜브 영상 조회 완료", responseDto);
-
+        List<String> responseDto = imagesService.uploadImages(multipartFile, "images");
+        return createBaseResponse(HttpStatus.CREATED, "이미지 저장 완료", responseDto);
     }
+
+    @DeleteMapping("/image")
+    public ResponseEntity<SuccessResponse> deleteImage(@RequestHeader(name = "Authorization") String bearerToken,
+                                                       @RequestParam String fileName) {
+        jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        imagesService.deleteImage(fileName);
+        return createSuccessResponse(HttpStatus.OK, "이미지 삭제 완료");
+    }
+
 }

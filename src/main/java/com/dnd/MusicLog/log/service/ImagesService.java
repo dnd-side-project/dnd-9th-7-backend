@@ -2,6 +2,7 @@ package com.dnd.MusicLog.log.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
@@ -17,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Service
 @RequiredArgsConstructor
-public class ImagesUploadService {
+@Service
+public class ImagesService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -53,9 +54,21 @@ public class ImagesUploadService {
         return fileNameList;
     }
 
+    public void deleteImage(String fileName) {
+        getFileExtension(fileName);
+        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+    }
+
     private String createFileName(String fileName, String dirName) {
         return dirName + "/" + UUID.randomUUID() + fileName;
     }
 
-}
+    private String getFileExtension(String fileName) {
+        try {
+            return fileName.substring(fileName.lastIndexOf("."));
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new BusinessLogicException(ErrorCode.BAD_REQUEST_FILENAME);
+        }
+    }
 
+}

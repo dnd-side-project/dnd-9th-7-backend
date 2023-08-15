@@ -3,7 +3,8 @@ package com.dnd.MusicLog.music.dto;
 import com.dnd.MusicLog.music.entity.Album;
 import com.dnd.MusicLog.music.entity.Artist;
 import com.dnd.MusicLog.music.entity.Music;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Value;
 
@@ -11,11 +12,11 @@ import lombok.Value;
 public class SaveMusicResponseDto {
 
     MusicResponse music;
-    ArtistResponse[] artists;
+    List<ArtistResponse> artists = new ArrayList<>();
     AlbumResponse album;
 
     @Builder
-    public SaveMusicResponseDto(Music music, Artist[] artists, Album album) {
+    public SaveMusicResponseDto(Music music, List<Artist> artists, Album album) {
         this.music = new MusicResponse(
             music.getId(),
             music.getName(),
@@ -23,15 +24,16 @@ public class SaveMusicResponseDto {
             music.getUniqueId(),
             music.isCustom(),
             music.getReleaseDate());
-        this.artists = artists == null
-            ? new ArtistResponse[]{}
-            : Arrays.stream(artists)
+        if (artists != null) {
+            List<ArtistResponse> artistResponses = artists.stream()
                 .map(artist -> new ArtistResponse(
                     artist.getId(),
                     artist.getImageUrl(),
                     artist.getUniqueId(),
                     artist.isCustom()))
-                .toArray(ArtistResponse[]::new);
+                .toList();
+            this.artists.addAll(artistResponses);
+        }
         this.album = album == null
             ? null
             : new AlbumResponse(

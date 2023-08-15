@@ -14,7 +14,6 @@ import com.dnd.MusicLog.music.repository.AlbumRepository;
 import com.dnd.MusicLog.music.repository.ArtistRepository;
 import com.dnd.MusicLog.music.repository.MusicArtistRelationRepository;
 import com.dnd.MusicLog.music.repository.MusicRepository;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -64,7 +63,7 @@ public class MusicService {
     public SaveMusicResponseDto saveMusic(
         long userId,
         MusicRequestDto musicRequestDto,
-        ArtistRequestDto[] artistRequestDto,
+        List<ArtistRequestDto> artistRequestDto,
         AlbumRequestDto albumRequestDto) {
         Optional<Music> musicOptional = findMusic(userId, musicRequestDto);
 
@@ -72,7 +71,7 @@ public class MusicService {
             // music 기준으로 이미 정의된 음악의 경우 새로운 데이터를 생성하지 않고 기존 데이터를 반환
             Music music = musicOptional.get();
             List<MusicArtistRelation> relations = musicArtistRelationRepository.findAllByMusic(music);
-            Artist[] artists = relations.stream().map(MusicArtistRelation::getArtist).toArray(Artist[]::new);
+            List<Artist> artists = relations.stream().map(MusicArtistRelation::getArtist).toList();
 
             return SaveMusicResponseDto.builder()
                 .music(music)
@@ -81,7 +80,7 @@ public class MusicService {
                 .build();
         }
 
-        // music 기준으로 새로운 음악의 경우 artist, album에 대해서 getOrCreate 진행 후 관계 매핑을 진행
+        // music 기준으로 새로운 음악의 경우 artist, album 에 대해서 getOrCreate 진행 후 관계 매핑을 진행
         Music music = Music.builder()
             .name(musicRequestDto.name())
             .imageUrl(musicRequestDto.imageUrl())
@@ -93,19 +92,18 @@ public class MusicService {
 
         musicRepository.save(music);
 
-        Artist[] artists = Arrays.stream(artistRequestDto)
+        List<Artist> artists = artistRequestDto.stream()
             .map(dto -> getOrCreateArtist(userId, dto))
             .filter(Objects::nonNull)
-            .toArray(Artist[]::new);
+            .toList();
         Album album = getOrCreateAlbum(userId, albumRequestDto);
 
         music.intoAlbum(album);
-        Arrays.stream(artists).forEach(artist -> {
+        artists.forEach(artist -> {
             MusicArtistRelation relation = MusicArtistRelation.builder()
                 .music(music)
                 .artist(artist)
                 .build();
-
             musicArtistRelationRepository.save(relation);
         });
 

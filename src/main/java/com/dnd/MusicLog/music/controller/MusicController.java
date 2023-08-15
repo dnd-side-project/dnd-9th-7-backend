@@ -64,6 +64,6 @@ public class MusicController extends BaseController {
             artists,
             album);
 
-        return createResponseEntity(HttpStatus.OK, "음악 정보 저장 완료", responseDto);
+        return createBaseResponse(HttpStatus.OK, "음악 정보 저장 완료", responseDto);
     }
 }

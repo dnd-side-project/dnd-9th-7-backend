@@ -1,5 +1,7 @@
 package com.dnd.MusicLog.music.service;
 
+import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
+import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.AlbumRequestDto;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.ArtistRequestDto;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.MusicRequestDto;
@@ -65,6 +67,10 @@ public class MusicService {
         MusicRequestDto musicRequestDto,
         List<ArtistRequestDto> artistRequestDto,
         AlbumRequestDto albumRequestDto) {
+        if (musicRequestDto.uniqueId() == null) {
+            throw new BusinessLogicException(ErrorCode.BAD_REQUEST);
+        }
+        
         Optional<Music> musicOptional = findMusic(userId, musicRequestDto);
 
         if (musicOptional.isPresent()) {

@@ -28,7 +28,7 @@ public class OAuthController extends BaseController {
     public ResponseEntity<BaseResponse<AuthTokensResponseDto>> loginUser(@RequestBody KakaoLoginParams params) {
 
         AuthTokensResponseDto responseDto = oAuthLoginService.loginUser(params);
-        return createResponseEntity(HttpStatus.OK, "로그인 완료", responseDto);
+        return createBaseResponse(HttpStatus.OK, "로그인 완료", responseDto);
 
     }
 
@@ -36,7 +36,7 @@ public class OAuthController extends BaseController {
     public ResponseEntity<BaseResponse<AccessTokenResponseDto>> regenerateAccessToken(@RequestBody RefreshToken refreshToken) {
 
         AccessTokenResponseDto responseDto = refreshTokenService.regenerateAccessToken(refreshToken.refreshToken());
-        return createResponseEntity(HttpStatus.OK, "액세스 토큰 재발급 완료", responseDto);
+        return createBaseResponse(HttpStatus.OK, "액세스 토큰 재발급 완료", responseDto);
 
     }
 }

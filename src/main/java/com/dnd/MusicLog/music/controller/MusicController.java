@@ -4,14 +4,9 @@ import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto;
-import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.AlbumRequestDto;
-import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.ArtistRequestDto;
-import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.MusicRequestDto;
 import com.dnd.MusicLog.music.dto.SaveMusicResponseDto;
 import com.dnd.MusicLog.music.dto.SpotifyTrackResponseDto;
 import com.dnd.MusicLog.music.service.MusicService;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,24 +40,7 @@ public class MusicController extends BaseController {
         String subject = jwtTokenProvider.extractAccessTokenSubject(token);
         long userId = Long.parseLong(subject);
 
-        // 필수 값으로 null validation 진행하지 않음
-        MusicRequestDto music = saveMusicRequestDto.music();
-
-        List<ArtistRequestDto> artists = saveMusicRequestDto.artists();
-        if (artists == null || artists.isEmpty()) {
-            artists = new ArrayList<>();
-        }
-
-        AlbumRequestDto album = saveMusicRequestDto.album();
-        if (album == null) {
-            album = new AlbumRequestDto(null, null, null, false, null);
-        }
-
-        SaveMusicResponseDto responseDto = musicService.saveMusic(
-            userId,
-            music,
-            artists,
-            album);
+        SaveMusicResponseDto responseDto = musicService.saveMusic(userId, saveMusicRequestDto);
 
         return createBaseResponse(HttpStatus.OK, "음악 정보 저장 완료", responseDto);
     }

@@ -2,6 +2,7 @@ package com.dnd.MusicLog.music.service;
 
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
 import com.dnd.MusicLog.global.error.exception.ErrorCode;
+import com.dnd.MusicLog.music.dto.SaveMusicRequestDto;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.AlbumRequestDto;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.ArtistRequestDto;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.MusicRequestDto;
@@ -16,6 +17,7 @@ import com.dnd.MusicLog.music.repository.AlbumRepository;
 import com.dnd.MusicLog.music.repository.ArtistRepository;
 import com.dnd.MusicLog.music.repository.MusicArtistRelationRepository;
 import com.dnd.MusicLog.music.repository.MusicRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -62,15 +64,13 @@ public class MusicService {
     }
 
     @Transactional
-    public SaveMusicResponseDto saveMusic(
-        long userId,
-        MusicRequestDto musicRequestDto,
-        List<ArtistRequestDto> artistRequestDto,
-        AlbumRequestDto albumRequestDto) {
+    public SaveMusicResponseDto saveMusic(long userId, SaveMusicRequestDto saveMusicRequestDto) {
+        MusicRequestDto musicRequestDto = saveMusicRequestDto.music();
+
         if (musicRequestDto.uniqueId() == null) {
             throw new BusinessLogicException(ErrorCode.BAD_REQUEST);
         }
-        
+
         Optional<Music> musicOptional = findMusic(userId, musicRequestDto);
 
         if (musicOptional.isPresent()) {
@@ -98,6 +98,9 @@ public class MusicService {
 
         musicRepository.save(music);
 
+        List<ArtistRequestDto> artistRequestDto = validateArtistRequestDto(saveMusicRequestDto.artists());
+        AlbumRequestDto albumRequestDto = validateAlbumRequestDto(saveMusicRequestDto.album());
+
         List<Artist> artists = artistRequestDto.stream()
             .map(dto -> getOrCreateArtist(userId, dto))
             .filter(Objects::nonNull)
@@ -118,6 +121,17 @@ public class MusicService {
             .artists(artists)
             .album(album)
             .build();
+    }
+
+    private AlbumRequestDto validateAlbumRequestDto(AlbumRequestDto albumRequestDto) {
+        if (albumRequestDto == null) {
+            return new AlbumRequestDto(null, null, null, false, null);
+        }
+        return albumRequestDto;
+    }
+
+    private List<ArtistRequestDto> validateArtistRequestDto(List<ArtistRequestDto> artistRequestDtos) {
+        return artistRequestDtos == null ? new ArrayList<>() : artistRequestDtos;
     }
 
     private Optional<Music> findMusic(long userId, MusicRequestDto musicRequestDto) {

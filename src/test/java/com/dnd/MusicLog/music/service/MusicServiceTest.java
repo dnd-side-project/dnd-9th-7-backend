@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
+import com.dnd.MusicLog.music.dto.SaveMusicRequestDto;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.AlbumRequestDto;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.ArtistRequestDto;
 import com.dnd.MusicLog.music.dto.SaveMusicRequestDto.MusicRequestDto;
@@ -12,7 +13,6 @@ import com.dnd.MusicLog.music.dto.SaveMusicResponseDto.AlbumResponse;
 import com.dnd.MusicLog.music.dto.SaveMusicResponseDto.ArtistResponse;
 import com.dnd.MusicLog.music.dto.SaveMusicResponseDto.MusicResponse;
 import com.dnd.MusicLog.music.dto.SpotifyTrackResponseDto;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -50,12 +50,10 @@ class MusicServiceTest {
             MusicRequestDto musicRequestDto =
                 new MusicRequestDto("custom-music-01", null, "music01", true, "2023-01-01");
 
+            SaveMusicRequestDto saveMusicRequestDto = new SaveMusicRequestDto(musicRequestDto, null, null);
+
             // when
-            SaveMusicResponseDto response = musicService.saveMusic(
-                1,
-                musicRequestDto,
-                Collections.emptyList(),
-                new AlbumRequestDto(null, null, null, false, null));
+            SaveMusicResponseDto response = musicService.saveMusic(1, saveMusicRequestDto);
 
             // then
             MusicResponse savedMusic = response.getMusic();
@@ -77,9 +75,12 @@ class MusicServiceTest {
             AlbumRequestDto albumRequestDto =
                 new AlbumRequestDto("custom-album-02", null, "album02", true, "2023-01-01");
 
+            SaveMusicRequestDto saveMusicRequestDto =
+                new SaveMusicRequestDto(musicRequestDto, List.of(artistRequestDto), albumRequestDto);
+
             // when
             SaveMusicResponseDto response =
-                musicService.saveMusic(1, musicRequestDto, List.of(artistRequestDto), albumRequestDto);
+                musicService.saveMusic(1, saveMusicRequestDto);
 
             // then
             MusicResponse savedMusic = response.getMusic();
@@ -106,15 +107,17 @@ class MusicServiceTest {
             AlbumRequestDto albumRequestDto =
                 new AlbumRequestDto("custom-album-03", null, "album03", true, "2023-01-01");
 
+            SaveMusicRequestDto saveMusicRequestDto =
+                new SaveMusicRequestDto(musicRequestDto, List.of(artistRequestDto), albumRequestDto);
+
+            SaveMusicRequestDto saveMusicRequestDtoOfExistMusic =
+                new SaveMusicRequestDto(musicRequestDto, null, null);
+
             // when
             SaveMusicResponseDto response01 =
-                musicService.saveMusic(1, musicRequestDto, List.of(artistRequestDto), albumRequestDto);
+                musicService.saveMusic(1, saveMusicRequestDto);
 
-            SaveMusicResponseDto response02 =
-                musicService.saveMusic(
-                    1,
-                    musicRequestDto, List.of(),
-                    new AlbumRequestDto(null, null, null, false, null));
+            SaveMusicResponseDto response02 = musicService.saveMusic(1, saveMusicRequestDtoOfExistMusic);
 
             // then
             assertThat(response01).isEqualTo(response02);
@@ -134,10 +137,13 @@ class MusicServiceTest {
             AlbumRequestDto albumRequestDto =
                 new AlbumRequestDto("custom-album-04", null, "album04", true, "2023-01-01");
 
+            SaveMusicRequestDto saveMusicRequestDto =
+                new SaveMusicRequestDto(musicRequestDto, List.of(artistRequestDto), albumRequestDto);
+
             // when
             // then
             assertThatThrownBy(
-                () -> musicService.saveMusic(1, musicRequestDto, List.of(artistRequestDto), albumRequestDto))
+                () -> musicService.saveMusic(1, saveMusicRequestDto))
                 .isInstanceOf(BusinessLogicException.class);
         }
     }

@@ -1,4 +1,4 @@
-package com.dnd.MusicLog.log.service;
+package com.dnd.MusicLog.image.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;

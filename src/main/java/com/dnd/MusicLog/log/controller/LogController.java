@@ -4,7 +4,7 @@ import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.common.SuccessResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
-import com.dnd.MusicLog.log.service.ImagesService;
+import com.dnd.MusicLog.image.service.ImagesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

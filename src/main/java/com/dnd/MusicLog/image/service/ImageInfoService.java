@@ -7,6 +7,8 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
 import com.dnd.MusicLog.global.error.exception.ErrorCode;
+import com.dnd.MusicLog.image.entity.ImageInfo;
+import com.dnd.MusicLog.image.repository.ImageInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class ImageInfoService {
     private String bucket;
 
     private final AmazonS3 amazonS3;
+    private final ImageInfoRepository imageInfoRepository;
 
     public List<String> uploadImages(List<MultipartFile> multipartFile, String dirName) {
 
@@ -34,6 +37,7 @@ public class ImageInfoService {
         }
 
         List<String> fileNameList = new ArrayList<>();
+        List<ImageInfo> imageInfoList = new ArrayList<>();
 
         multipartFile.forEach(file -> {
             String fileName = createFileName(file.getOriginalFilename(), dirName);
@@ -42,6 +46,7 @@ public class ImageInfoService {
             objectMetadata.setContentType(file.getContentType());
 
             try(InputStream inputStream = file.getInputStream()) {
+                // S3에 이미지 업로드
                 amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
             } catch(IOException e) {
@@ -49,7 +54,17 @@ public class ImageInfoService {
             }
 
             fileNameList.add(fileName);
+
+            // ImageInfo 객체 생성 후 리스트에 추가
+            ImageInfo imageInfo = ImageInfo.builder()
+                .logId(1) // TODO : 로그 ID 값으로 지정, 로그 테이블과 연관관계 설정 후 변경예정.
+                .imageName(file.getOriginalFilename())
+                .build();
+
+            imageInfoList.add(imageInfo);
         });
+
+        imageInfoRepository.saveAll(imageInfoList);
 
         return fileNameList;
     }

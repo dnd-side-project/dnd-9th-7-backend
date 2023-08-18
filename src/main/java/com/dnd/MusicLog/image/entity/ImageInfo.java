@@ -20,16 +20,13 @@ public class ImageInfo extends BaseTimeEntity {
     @Column(name = "log_id", nullable = false)
     private long logId;
 
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl;
 
     @Column(name = "image_name", nullable = false)
     private String imageName;
 
     @Builder
-    public ImageInfo(long logId, String imageUrl, String imageName) {
+    public ImageInfo(long logId, String imageName) {
         this.logId = logId;
-        this.imageUrl = imageUrl;
         this.imageName = imageName;
     }
 }

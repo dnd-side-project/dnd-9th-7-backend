@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class ImagesService {
+public class ImageInfoService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;

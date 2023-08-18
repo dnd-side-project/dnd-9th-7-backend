@@ -3,8 +3,8 @@ package com.dnd.MusicLog.music.controller;
 import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
-import com.dnd.MusicLog.music.dto.SaveMusicRequestDto;
-import com.dnd.MusicLog.music.dto.SaveMusicResponseDto;
+import com.dnd.MusicLog.music.dto.SaveCustomMusicRequestDto;
+import com.dnd.MusicLog.music.dto.SaveCustomMusicResponseDto;
 import com.dnd.MusicLog.music.dto.SpotifyTrackResponseDto;
 import com.dnd.MusicLog.music.service.MusicService;
 import lombok.RequiredArgsConstructor;
@@ -34,13 +34,13 @@ public class MusicController extends BaseController {
     }
 
     @PostMapping("")
-    public ResponseEntity<BaseResponse<SaveMusicResponseDto>> saveMusic(
+    public ResponseEntity<BaseResponse<SaveCustomMusicResponseDto>> saveCustomMusic(
         @RequestHeader(name = "Authorization") String token,
-        @RequestBody SaveMusicRequestDto saveMusicRequestDto) {
+        @RequestBody SaveCustomMusicRequestDto saveCustomMusicRequestDto) {
         String subject = jwtTokenProvider.extractAccessTokenSubject(token);
         long userId = Long.parseLong(subject);
 
-        SaveMusicResponseDto responseDto = musicService.saveMusic(userId, saveMusicRequestDto);
+        SaveCustomMusicResponseDto responseDto = musicService.saveCustomMusic(userId, saveCustomMusicRequestDto);
 
         return createBaseResponse(HttpStatus.OK, "음악 정보 저장 완료", responseDto);
     }

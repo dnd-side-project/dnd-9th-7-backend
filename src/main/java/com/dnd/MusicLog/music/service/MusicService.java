@@ -17,10 +17,9 @@ import com.dnd.MusicLog.music.repository.AlbumRepository;
 import com.dnd.MusicLog.music.repository.ArtistRepository;
 import com.dnd.MusicLog.music.repository.MusicArtistRelationRepository;
 import com.dnd.MusicLog.music.repository.MusicRepository;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -98,14 +97,8 @@ public class MusicService {
 
         musicRepository.save(music);
 
-        List<ArtistRequestDto> artistRequestDto = validateArtistRequestDto(saveMusicRequestDto.artists());
-        AlbumRequestDto albumRequestDto = validateAlbumRequestDto(saveMusicRequestDto.album());
-
-        List<Artist> artists = artistRequestDto.stream()
-            .map(dto -> getOrCreateArtist(userId, dto))
-            .filter(Objects::nonNull)
-            .toList();
-        Album album = getOrCreateAlbum(userId, albumRequestDto);
+        List<Artist> artists = getOrCreateArtists(userId, saveMusicRequestDto.artists());
+        Album album = getOrCreateAlbum(userId, saveMusicRequestDto.album());
 
         music.intoAlbum(album);
         artists.forEach(artist -> {
@@ -123,17 +116,6 @@ public class MusicService {
             .build();
     }
 
-    private AlbumRequestDto validateAlbumRequestDto(AlbumRequestDto albumRequestDto) {
-        if (albumRequestDto == null) {
-            return new AlbumRequestDto(null, null, null, false, null);
-        }
-        return albumRequestDto;
-    }
-
-    private List<ArtistRequestDto> validateArtistRequestDto(List<ArtistRequestDto> artistRequestDtos) {
-        return artistRequestDtos == null ? new ArrayList<>() : artistRequestDtos;
-    }
-
     private Optional<Music> findMusic(long userId, MusicRequestDto musicRequestDto) {
         if (musicRequestDto.custom()) {
             return musicRepository.findByAuthorAndUniqueId(userId, musicRequestDto.uniqueId());
@@ -141,11 +123,18 @@ public class MusicService {
         return musicRepository.findByUniqueId(musicRequestDto.uniqueId());
     }
 
-    private Artist getOrCreateArtist(long userId, ArtistRequestDto artistRequestDto) {
-        if (!StringUtils.hasText(artistRequestDto.uniqueId())) {
-            return null;
+    private List<Artist> getOrCreateArtists(long userId, List<ArtistRequestDto> artistRequestDtos) {
+        if (artistRequestDtos == null) {
+            return List.of();
         }
 
+        return artistRequestDtos.stream()
+            .filter(dto -> dto.uniqueId() != null)
+            .map(dto -> getOrCreateArtist(userId, dto))
+            .collect(Collectors.toList());
+    }
+
+    private Artist getOrCreateArtist(long userId, ArtistRequestDto artistRequestDto) {
         Optional<Artist> artistOptional = Optional.empty();
 
         if (artistRequestDto.custom()) {
@@ -171,7 +160,7 @@ public class MusicService {
     }
 
     private Album getOrCreateAlbum(long userId, AlbumRequestDto albumRequestDto) {
-        if (!StringUtils.hasText(albumRequestDto.uniqueId())) {
+        if (albumRequestDto == null || !StringUtils.hasText(albumRequestDto.uniqueId())) {
             return null;
         }
 

@@ -12,6 +12,7 @@ import com.dnd.MusicLog.imageinfo.repository.ImageInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class ImageInfoService {
     private final AmazonS3 amazonS3;
     private final ImageInfoRepository imageInfoRepository;
 
+    @Transactional
     public List<String> uploadImages(List<MultipartFile> multipartFile, String dirName) {
 
         if (multipartFile.size() > 10) {
@@ -58,7 +60,7 @@ public class ImageInfoService {
             // ImageInfo 객체 생성 후 리스트에 추가
             ImageInfo imageInfo = ImageInfo.builder()
                 .logId(1) // TODO : 로그 ID 값으로 지정, 로그 테이블과 연관관계 설정 후 변경예정.
-                .imageName(file.getOriginalFilename())
+                .imageName(fileName)
                 .build();
 
             imageInfoList.add(imageInfo);
@@ -72,6 +74,23 @@ public class ImageInfoService {
     public void deleteImage(String fileName) {
         getFileExtension(fileName);
         amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+    }
+
+    // TODO : 로그 테이블 생성 후 조인을 이용할 예정
+    public List<String> searchImages(long logId) {
+        List<ImageInfo> imageInfoList = imageInfoRepository.findAllByLogId(logId);
+
+        if (imageInfoList.isEmpty()) {
+            throw new BusinessLogicException(ErrorCode.NOT_FOUND);
+        }
+
+        List<String> fileNameList = new ArrayList<>();
+
+        imageInfoList.forEach(imageInfo -> {
+            fileNameList.add(imageInfo.getImageName());
+        });
+
+        return fileNameList;
     }
 
     private String createFileName(String fileName, String dirName) {

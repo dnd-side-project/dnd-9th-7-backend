@@ -71,8 +71,13 @@ public class ImageInfoService {
         return fileNameList;
     }
 
+    @Transactional
     public void deleteImage(String fileName) {
         getFileExtension(fileName);
+        ImageInfo imageInfo = imageInfoRepository.findByImageName(fileName)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
+
+        imageInfoRepository.deleteByImageName(imageInfo.getImageName());
         amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }
 

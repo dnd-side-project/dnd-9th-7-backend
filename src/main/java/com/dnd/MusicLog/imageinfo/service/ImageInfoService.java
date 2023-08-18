@@ -1,4 +1,4 @@
-package com.dnd.MusicLog.image.service;
+package com.dnd.MusicLog.imageinfo.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
@@ -7,8 +7,8 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
 import com.dnd.MusicLog.global.error.exception.ErrorCode;
-import com.dnd.MusicLog.image.entity.ImageInfo;
-import com.dnd.MusicLog.image.repository.ImageInfoRepository;
+import com.dnd.MusicLog.imageinfo.entity.ImageInfo;
+import com.dnd.MusicLog.imageinfo.repository.ImageInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.dnd.MusicLog.image.entity;
+package com.dnd.MusicLog.imageinfo.entity;
 
 import com.dnd.MusicLog.global.common.BaseTimeEntity;
 import jakarta.persistence.*;

@@ -36,4 +36,11 @@ public class ImageInfoController extends BaseController {
         imageInfoService.deleteImage(fileName);
         return createSuccessResponse(HttpStatus.OK, "이미지 삭제 완료");
     }
+
+    @GetMapping("/image")
+    public ResponseEntity<BaseResponse<List<String>>> searchImages(@RequestHeader(name = "Authorization") String bearerToken) {
+        jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        List<String> responseDto = imageInfoService.searchImages(1);
+        return createBaseResponse(HttpStatus.OK, "이미지 조회 완료", responseDto);
+    }
 }

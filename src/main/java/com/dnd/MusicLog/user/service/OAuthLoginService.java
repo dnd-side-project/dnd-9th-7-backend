@@ -1,16 +1,17 @@
 package com.dnd.MusicLog.user.service;
 
-import com.dnd.MusicLog.global.jwt.service.AuthTokensGeneratorService;
+import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
+import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import com.dnd.MusicLog.global.jwt.dto.AuthTokensResponseDto;
+import com.dnd.MusicLog.global.jwt.service.AuthTokensGeneratorService;
+import com.dnd.MusicLog.user.entity.User;
 import com.dnd.MusicLog.user.oauth.OAuthInfoResponse;
 import com.dnd.MusicLog.user.oauth.OAuthLoginParams;
-import com.dnd.MusicLog.user.entity.User;
 import com.dnd.MusicLog.user.repository.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,12 @@ public class OAuthLoginService {
         OAuthInfoResponse oAuthInfoResponse = requestOAuthInfoService.request(params);
         Long userId = validateUserByEmail(oAuthInfoResponse);
         return authTokensGeneratorService.generateAuthToken(userId);
+    }
+
+    @Transactional
+    public User getUser(long userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
     }
 
     private Long validateUserByEmail(OAuthInfoResponse oAuthInfoResponse) {

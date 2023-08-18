@@ -16,6 +16,7 @@ public class ImageInfo extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    // TODO : 로그 엔티티 생성 후 연관관계 설정할 것.
     @Column(name = "log_id", nullable = false)
     private long logId;
 
@@ -26,7 +27,8 @@ public class ImageInfo extends BaseTimeEntity {
     private String imageName;
 
     @Builder
-    public ImageInfo(String imageUrl, String imageName) {
+    public ImageInfo(long logId, String imageUrl, String imageName) {
+        this.logId = logId;
         this.imageUrl = imageUrl;
         this.imageName = imageName;
     }

@@ -37,15 +37,16 @@ public class MusicController extends BaseController {
     @GetMapping("/custom")
     public ResponseEntity<BaseResponse<SearchCustomMusicResponseDto>> searchCustomMusic(
         @RequestHeader(name = "Authorization") String token,
-        @RequestParam("query") String query,
-        @RequestParam("offset") int offset) {
+        @RequestParam(value = "query") String query,
+        @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+        @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
         String subject = jwtTokenProvider.extractAccessTokenSubject(token);
         long userId = Long.parseLong(subject);
 
         SearchCustomMusicResponseDto response =
-            musicService.searchCustomMusic(userId, query, offset);
+            musicService.searchCustomMusic(userId, query, offset, size);
 
-        return createBaseResponse(HttpStatus.OK, "커스텀 음악 조회 성공", response);
+        return createBaseResponse(HttpStatus.OK, "커스텀 음악 검색 성공", response);
     }
 
     @PostMapping("/custom")

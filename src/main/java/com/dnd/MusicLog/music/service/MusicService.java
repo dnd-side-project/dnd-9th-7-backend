@@ -1,15 +1,20 @@
 package com.dnd.MusicLog.music.service;
 
+import com.dnd.MusicLog.music.dto.CustomMusicItem;
 import com.dnd.MusicLog.music.dto.SaveCustomMusicRequestDto;
 import com.dnd.MusicLog.music.dto.SaveCustomMusicResponseDto;
+import com.dnd.MusicLog.music.dto.SearchCustomMusicResponseDto;
 import com.dnd.MusicLog.music.dto.SpotifyTokenResponseDto;
 import com.dnd.MusicLog.music.dto.SpotifyTrackResponseDto;
 import com.dnd.MusicLog.music.entity.custom.CustomMusic;
 import com.dnd.MusicLog.music.repository.custom.CustomMusicRepository;
 import com.dnd.MusicLog.user.entity.User;
 import com.dnd.MusicLog.user.service.OAuthLoginService;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -34,7 +39,7 @@ public class MusicService {
     @Value("${spotify.client.secret}")
     private String SPOTIFY_CLIENT_SECRET;
 
-    public SpotifyTrackResponseDto searchMusic(String query, int offset) {
+    public SpotifyTrackResponseDto searchSpotifyMusic(String query, int offset) {
         SpotifyTokenResponseDto spotifyTokenResponseDto = getToken();
         String accessToken = spotifyTokenResponseDto.accessToken();
 
@@ -47,6 +52,21 @@ public class MusicService {
             .bodyToMono(SpotifyTrackResponseDto.class)
             .block();
     }
+
+    @Transactional(readOnly = true)
+    public SearchCustomMusicResponseDto searchCustomMusic(long userId, String query, int offset, int size) {
+        PageRequest pageRequest = PageRequest.of(offset, size);
+
+        List<CustomMusic> customMusic =
+            customMusicRepository.searchAllByUserIdAndQuery(userId, query, pageRequest);
+
+        List<CustomMusicItem> items = customMusic.stream()
+            .map(CustomMusicItem::new)
+            .collect(Collectors.toList());
+
+        return new SearchCustomMusicResponseDto(offset, customMusic.size(), items);
+    }
+
 
     @Transactional
     public SaveCustomMusicResponseDto saveCustomMusic(long userId, SaveCustomMusicRequestDto requestDto) {

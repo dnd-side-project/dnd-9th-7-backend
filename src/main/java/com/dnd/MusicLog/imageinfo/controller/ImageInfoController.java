@@ -25,7 +25,7 @@ public class ImageInfoController extends BaseController {
     public ResponseEntity<BaseResponse<List<String>>> uploadImages(@RequestHeader(name = "Authorization") String bearerToken,
                                                                    @RequestPart("images") List<MultipartFile> multipartFile) {
         jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        List<String> responseDto = imageInfoService.uploadImages(multipartFile, "images");
+        List<String> responseDto = imageInfoService.uploadImages(multipartFile);
         return createBaseResponse(HttpStatus.CREATED, "이미지 저장 완료", responseDto);
     }
 

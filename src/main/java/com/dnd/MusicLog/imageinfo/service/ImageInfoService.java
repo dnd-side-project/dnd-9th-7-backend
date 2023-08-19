@@ -25,6 +25,8 @@ import java.util.UUID;
 @Service
 public class ImageInfoService {
 
+    private static final String DIRECTORY_NAME = "images";
+
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
@@ -32,7 +34,7 @@ public class ImageInfoService {
     private final ImageInfoRepository imageInfoRepository;
 
     @Transactional
-    public List<String> uploadImages(List<MultipartFile> multipartFile, String dirName) {
+    public List<String> uploadImages(List<MultipartFile> multipartFile) {
 
         if (multipartFile.size() > 10) {
             throw new BusinessLogicException(ErrorCode.BAD_REQUEST_MULTIPART);
@@ -42,7 +44,7 @@ public class ImageInfoService {
         List<ImageInfo> imageInfoList = new ArrayList<>();
 
         multipartFile.forEach(file -> {
-            String fileName = createFileName(file.getOriginalFilename(), dirName);
+            String fileName = createFileName(file.getOriginalFilename(), DIRECTORY_NAME);
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength(file.getSize());
             objectMetadata.setContentType(file.getContentType());

@@ -63,4 +63,19 @@ public class CustomMusicService {
 
         return new SaveCustomMusicResponseDto(customMusic);
     }
+
+    @Transactional
+    public SaveCustomMusicResponseDto updateCustomMusic(
+        long userId,
+        long customMusicId,
+        SaveCustomMusicRequestDto request) {
+        User user = oAuthLoginService.getUser(userId);
+
+        CustomMusic music = customMusicRepository.findByIdAndAuthor(customMusicId, user)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
+
+        music.updateStaticInfo(request.name(), request.artist(), request.imageUrl());
+
+        return new SaveCustomMusicResponseDto(music);
+    }
 }

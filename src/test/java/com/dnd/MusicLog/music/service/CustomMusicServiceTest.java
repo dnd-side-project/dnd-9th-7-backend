@@ -150,5 +150,32 @@ class CustomMusicServiceTest {
             assertThatThrownBy(() -> customMusicService.updateCustomMusic(2, 1, request))
                 .isInstanceOf(BusinessLogicException.class);
         }
+
+        @DisplayName("userId 와 customMusicId 로 음악을 삭제하는데 성공한다.")
+        @Test
+        void deleteByIdAndCustomMusicId() {
+            // given
+            CustomMusicRequestDto saveCustomMusicRequestDto =
+                new CustomMusicRequestDto("hello", "hello", "hello");
+            CustomMusicResponseDto saveCustomMusicResponseDto =
+                customMusicService.saveCustomMusic(1, saveCustomMusicRequestDto);
+
+            // when
+            CustomMusicResponseDto response =
+                customMusicService.deleteCustomMusic(1, saveCustomMusicResponseDto.getId());
+
+            // then
+            assertThat(response).isNotNull();
+            // 삭제 이후 조회하면 리소스 없음 에러
+            assertThatThrownBy(() -> customMusicService.deleteCustomMusic(1, response.getId()))
+                .isInstanceOf(BusinessLogicException.class);
+        }
+
+        @DisplayName("권한이 없는 음악을 삭제하면 존재하지 않는 리소스 에러가 발생한다.")
+        @Test
+        void deleteByIdWithInvalidAuthor() {
+            assertThatThrownBy(() -> customMusicService.deleteCustomMusic(2, 1))
+                .isInstanceOf(BusinessLogicException.class);
+        }
     }
 }

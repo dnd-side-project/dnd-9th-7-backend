@@ -11,6 +11,7 @@ import com.dnd.MusicLog.music.service.CustomMusicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,5 +81,17 @@ public class CustomMusicController extends BaseController {
             customMusicService.updateCustomMusic(userId, customMusicId, customMusicRequestDto);
 
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 수정 완료", response);
+    }
+
+    @DeleteMapping("/{customMusicId}")
+    public ResponseEntity<BaseResponse<CustomMusicResponseDto>> deleteCustomMusic(
+        @RequestHeader(name = "Authorization") String token,
+        @PathVariable(name = "customMusicId") long customMusicId) {
+        String subject = jwtTokenProvider.extractAccessTokenSubject(token);
+        long userId = Long.parseLong(subject);
+
+        CustomMusicResponseDto response = customMusicService.deleteCustomMusic(userId, customMusicId);
+
+        return createBaseResponse(HttpStatus.OK, "커스텀 음악 삭제 완료", response);
     }
 }

@@ -65,7 +65,7 @@ public class CustomMusicController extends BaseController {
 
         CustomMusicResponseDto responseDto = customMusicService.saveCustomMusic(userId, customMusicRequestDto);
 
-        return createBaseResponse(HttpStatus.OK, "음악 정보 저장 완료", responseDto);
+        return createBaseResponse(HttpStatus.OK, "커스텀 음악 저장 완료", responseDto);
     }
 
     @PutMapping("/{customMusicId}")
@@ -79,6 +79,6 @@ public class CustomMusicController extends BaseController {
         CustomMusicResponseDto response =
             customMusicService.updateCustomMusic(userId, customMusicId, customMusicRequestDto);
 
-        return createBaseResponse(HttpStatus.OK, "음악 정보 수정 완료", response);
+        return createBaseResponse(HttpStatus.OK, "커스텀 음악 수정 완료", response);
     }
 }

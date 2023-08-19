@@ -51,6 +51,7 @@ public class JwtTokenProvider {
         Claims claims = parseClaims(accessToken, JwtProperties.ACCESS_TOKEN_TYPE);
         return claims.getSubject();
 
+//        }
     }
 
     public String extractRefreshTokenSubject(String refreshToken) {

@@ -1,5 +1,7 @@
 package com.dnd.MusicLog.music.service;
 
+import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
+import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import com.dnd.MusicLog.music.dto.CustomMusicItem;
 import com.dnd.MusicLog.music.dto.SaveCustomMusicRequestDto;
 import com.dnd.MusicLog.music.dto.SaveCustomMusicResponseDto;
@@ -65,6 +67,16 @@ public class MusicService {
             .collect(Collectors.toList());
 
         return new SearchCustomMusicResponseDto(offset, customMusic.size(), items);
+    }
+
+    @Transactional(readOnly = true)
+    public CustomMusicItem searchCustomMusic(long userId, long customMusicId) {
+        User user = oAuthLoginService.getUser(userId);
+        
+        CustomMusic music = customMusicRepository.findByIdAndAuthor(customMusicId, user)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
+
+        return new CustomMusicItem(music);
     }
 
 

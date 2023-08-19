@@ -5,7 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
 import com.dnd.MusicLog.music.dto.CustomMusicItem;
-import com.dnd.MusicLog.music.dto.SaveCustomMusicRequestDto;
+import com.dnd.MusicLog.music.dto.CustomMusicRequestDto;
+import com.dnd.MusicLog.music.dto.CustomMusicResponseDto;
 import com.dnd.MusicLog.music.dto.SearchCustomMusicResponseDto;
 import com.dnd.MusicLog.user.entity.User;
 import com.dnd.MusicLog.user.enums.OAuthType;
@@ -52,14 +53,14 @@ class CustomMusicServiceTest {
             .build();
         userRepository.save(user02);
 
-        SaveCustomMusicRequestDto customMusic01 =
-            new SaveCustomMusicRequestDto("hello01", "hello01", "newjeans01");
+        CustomMusicRequestDto customMusic01 =
+            new CustomMusicRequestDto("hello01", "hello01", "newjeans01");
 
-        SaveCustomMusicRequestDto customMusic02 =
-            new SaveCustomMusicRequestDto("hello02", "hello02", "newjeans02");
+        CustomMusicRequestDto customMusic02 =
+            new CustomMusicRequestDto("hello02", "hello02", "newjeans02");
 
-        SaveCustomMusicRequestDto customMusic03 =
-            new SaveCustomMusicRequestDto("hello03", "hello03", "newjeans03");
+        CustomMusicRequestDto customMusic03 =
+            new CustomMusicRequestDto("hello03", "hello03", "newjeans03");
 
         customMusicService.saveCustomMusic(1, customMusic01);
         customMusicService.saveCustomMusic(1, customMusic02);
@@ -112,10 +113,41 @@ class CustomMusicServiceTest {
             assertThat(response.getArtist()).isEqualTo("newjeans01");
         }
 
-        @DisplayName("userId가 일치하지 않으면 존재하지 않는 리소스 에러가 발생한다.")
+        @DisplayName("권한이 없는 음악을 조회하면 존재하지 않는 리소스 에러가 발생한다.")
         @Test
         void searchByIdWithInvalidAuthor() {
             assertThatThrownBy(() -> customMusicService.searchCustomMusic(2, 1))
+                .isInstanceOf(BusinessLogicException.class);
+        }
+
+        @DisplayName("userId가 일치하지 않으면 존재하지 않는 리소스 에러가 발생한다.")
+        @Test
+        void updateByIdSuccessTest() {
+            // given
+            CustomMusicRequestDto saveCustomMusicRequestDto =
+                new CustomMusicRequestDto("name", "imageUrl", "artist");
+            CustomMusicResponseDto saveCustomMusicResponseDto =
+                customMusicService.saveCustomMusic(1, saveCustomMusicRequestDto);
+
+            // when
+            CustomMusicRequestDto updateCustomMusicRequestDto =
+                new CustomMusicRequestDto("updatedName", "updatedImageUrl", "updatedArtist");
+            CustomMusicResponseDto updateCustomMusicResponseDto =
+                customMusicService.updateCustomMusic(1, saveCustomMusicResponseDto.getId(),
+                    updateCustomMusicRequestDto);
+
+            // then
+            assertThat(updateCustomMusicResponseDto).isNotEqualTo(saveCustomMusicResponseDto);
+            assertThat(updateCustomMusicResponseDto.getName()).isEqualTo("updatedName");
+            assertThat(updateCustomMusicResponseDto.getImageUrl()).isEqualTo("updatedImageUrl");
+            assertThat(updateCustomMusicResponseDto.getArtist()).isEqualTo("updatedArtist");
+        }
+
+        @DisplayName("권한이 없는 음악을 수정하면 존재하지 않는 리소스 에러가 발생한다.")
+        @Test
+        void updateByIdWithInvalidAuthor() {
+            CustomMusicRequestDto request = new CustomMusicRequestDto("name", "image", "artist");
+            assertThatThrownBy(() -> customMusicService.updateCustomMusic(2, 1, request))
                 .isInstanceOf(BusinessLogicException.class);
         }
     }

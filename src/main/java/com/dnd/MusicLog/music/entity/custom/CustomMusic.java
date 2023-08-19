@@ -42,4 +42,10 @@ public class CustomMusic extends BaseTimeEntity {
         this.artist = artist;
         this.author = author;
     }
+
+    public void updateStaticInfo(String name, String artist, String imageUrl) {
+        this.name = name;
+        this.artist = artist;
+        this.imageUrl = imageUrl;
+    }
 }

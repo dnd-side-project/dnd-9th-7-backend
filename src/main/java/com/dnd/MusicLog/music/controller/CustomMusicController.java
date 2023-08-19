@@ -4,8 +4,8 @@ import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.music.dto.CustomMusicItem;
-import com.dnd.MusicLog.music.dto.SaveCustomMusicRequestDto;
-import com.dnd.MusicLog.music.dto.SaveCustomMusicResponseDto;
+import com.dnd.MusicLog.music.dto.CustomMusicRequestDto;
+import com.dnd.MusicLog.music.dto.CustomMusicResponseDto;
 import com.dnd.MusicLog.music.dto.SearchCustomMusicResponseDto;
 import com.dnd.MusicLog.music.service.CustomMusicService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,14 +57,28 @@ public class CustomMusicController extends BaseController {
     }
 
     @PostMapping("")
-    public ResponseEntity<BaseResponse<SaveCustomMusicResponseDto>> saveCustomMusic(
+    public ResponseEntity<BaseResponse<CustomMusicResponseDto>> saveCustomMusic(
         @RequestHeader(name = "Authorization") String token,
-        @RequestBody SaveCustomMusicRequestDto saveCustomMusicRequestDto) {
+        @RequestBody CustomMusicRequestDto customMusicRequestDto) {
         String subject = jwtTokenProvider.extractAccessTokenSubject(token);
         long userId = Long.parseLong(subject);
 
-        SaveCustomMusicResponseDto responseDto = customMusicService.saveCustomMusic(userId, saveCustomMusicRequestDto);
+        CustomMusicResponseDto responseDto = customMusicService.saveCustomMusic(userId, customMusicRequestDto);
 
-        return createBaseResponse(HttpStatus.OK, "음악 정보 저장 완료", responseDto);
+        return createBaseResponse(HttpStatus.OK, "커스텀 음악 저장 완료", responseDto);
+    }
+
+    @PutMapping("/{customMusicId}")
+    public ResponseEntity<BaseResponse<CustomMusicResponseDto>> updateCustomMusic(
+        @RequestHeader(name = "Authorization") String token,
+        @PathVariable(name = "customMusicId") long customMusicId,
+        @RequestBody CustomMusicRequestDto customMusicRequestDto) {
+        String subject = jwtTokenProvider.extractAccessTokenSubject(token);
+        long userId = Long.parseLong(subject);
+
+        CustomMusicResponseDto response =
+            customMusicService.updateCustomMusic(userId, customMusicId, customMusicRequestDto);
+
+        return createBaseResponse(HttpStatus.OK, "커스텀 음악 수정 완료", response);
     }
 }

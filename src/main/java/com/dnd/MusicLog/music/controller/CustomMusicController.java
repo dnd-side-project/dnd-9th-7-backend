@@ -7,7 +7,7 @@ import com.dnd.MusicLog.music.dto.CustomMusicItem;
 import com.dnd.MusicLog.music.dto.SaveCustomMusicRequestDto;
 import com.dnd.MusicLog.music.dto.SaveCustomMusicResponseDto;
 import com.dnd.MusicLog.music.dto.SearchCustomMusicResponseDto;
-import com.dnd.MusicLog.music.service.MusicService;
+import com.dnd.MusicLog.music.service.CustomMusicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CustomMusicController extends BaseController {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final MusicService musicService;
+    private final CustomMusicService customMusicService;
 
     @GetMapping("")
     public ResponseEntity<BaseResponse<SearchCustomMusicResponseDto>> searchCustomMusic(
@@ -38,7 +38,7 @@ public class CustomMusicController extends BaseController {
         long userId = Long.parseLong(subject);
 
         SearchCustomMusicResponseDto response =
-            musicService.searchCustomMusic(userId, query, offset, size);
+            customMusicService.searchCustomMusic(userId, query, offset, size);
 
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 검색 성공", response);
     }
@@ -50,7 +50,7 @@ public class CustomMusicController extends BaseController {
         String subject = jwtTokenProvider.extractAccessTokenSubject(token);
         long userId = Long.parseLong(subject);
 
-        CustomMusicItem response = musicService.searchCustomMusic(userId, customMusicId);
+        CustomMusicItem response = customMusicService.searchCustomMusic(userId, customMusicId);
 
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 검색 성공", response);
     }
@@ -62,7 +62,7 @@ public class CustomMusicController extends BaseController {
         String subject = jwtTokenProvider.extractAccessTokenSubject(token);
         long userId = Long.parseLong(subject);
 
-        SaveCustomMusicResponseDto responseDto = musicService.saveCustomMusic(userId, saveCustomMusicRequestDto);
+        SaveCustomMusicResponseDto responseDto = customMusicService.saveCustomMusic(userId, saveCustomMusicRequestDto);
 
         return createBaseResponse(HttpStatus.OK, "음악 정보 저장 완료", responseDto);
     }

@@ -28,7 +28,7 @@ public class OAuthLoginService {
         return authTokensGeneratorService.generateAuthToken(userId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public User getUser(long userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));

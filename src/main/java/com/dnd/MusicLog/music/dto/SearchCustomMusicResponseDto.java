@@ -1,8 +1,7 @@
 package com.dnd.MusicLog.music.dto;
 
-public record SearchCustomMusicResponseDto(int offset, int total, CustomMusicItem[] items) {
+import java.util.List;
 
-    record CustomMusicItem(long id, String name, String artist, String imageUrl) {
+public record SearchCustomMusicResponseDto(int offset, int total, List<CustomMusicItem> items) {
 
-    }
 }

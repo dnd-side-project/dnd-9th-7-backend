@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,5 +66,19 @@ public class CustomMusicController extends BaseController {
         SaveCustomMusicResponseDto responseDto = customMusicService.saveCustomMusic(userId, saveCustomMusicRequestDto);
 
         return createBaseResponse(HttpStatus.OK, "음악 정보 저장 완료", responseDto);
+    }
+
+    @PutMapping("/{customMusicId}")
+    public ResponseEntity<BaseResponse<SaveCustomMusicResponseDto>> updateCustomMusic(
+        @RequestHeader(name = "Authorization") String token,
+        @PathVariable(name = "customMusicId") long customMusicId,
+        @RequestBody SaveCustomMusicRequestDto saveCustomMusicRequestDto) {
+        String subject = jwtTokenProvider.extractAccessTokenSubject(token);
+        long userId = Long.parseLong(subject);
+
+        SaveCustomMusicResponseDto response =
+            customMusicService.updateCustomMusic(userId, customMusicId, saveCustomMusicRequestDto);
+
+        return createBaseResponse(HttpStatus.OK, "음악 정보 수정 완료", response);
     }
 }

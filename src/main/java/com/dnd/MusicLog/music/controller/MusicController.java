@@ -5,6 +5,7 @@ import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.music.dto.SaveCustomMusicRequestDto;
 import com.dnd.MusicLog.music.dto.SaveCustomMusicResponseDto;
+import com.dnd.MusicLog.music.dto.SearchCustomMusicResponseDto;
 import com.dnd.MusicLog.music.dto.SpotifyTrackResponseDto;
 import com.dnd.MusicLog.music.service.MusicService;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +27,28 @@ public class MusicController extends BaseController {
     private final JwtTokenProvider jwtTokenProvider;
     private final MusicService musicService;
 
-    @GetMapping("")
-    public SpotifyTrackResponseDto searchMusic(
+    @GetMapping("/spotify")
+    public SpotifyTrackResponseDto searchSpotifyMusic(
         @RequestParam("query") String query,
         @RequestParam("offset") int offset) {
-        return musicService.searchMusic(query, offset);
+        return musicService.searchSpotifyMusic(query, offset);
     }
 
-    @PostMapping("")
+    @GetMapping("/custom")
+    public ResponseEntity<BaseResponse<SearchCustomMusicResponseDto>> searchCustomMusic(
+        @RequestHeader(name = "Authorization") String token,
+        @RequestParam("query") String query,
+        @RequestParam("offset") int offset) {
+        String subject = jwtTokenProvider.extractAccessTokenSubject(token);
+        long userId = Long.parseLong(subject);
+
+        SearchCustomMusicResponseDto response =
+            musicService.searchCustomMusic(userId, query, offset);
+
+        return createBaseResponse(HttpStatus.OK, "커스텀 음악 조회 성공", response);
+    }
+
+    @PostMapping("/custom")
     public ResponseEntity<BaseResponse<SaveCustomMusicResponseDto>> saveCustomMusic(
         @RequestHeader(name = "Authorization") String token,
         @RequestBody SaveCustomMusicRequestDto saveCustomMusicRequestDto) {

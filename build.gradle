@@ -52,14 +52,14 @@ tasks.named('test') {
 }
 
 // querydsl 세팅 시작
-def generated = 'src/main/generated'
+def querydslDir = "$buildDir/generated/querydsl"
 
 querydsl {
     jpa = true
-    querydslSourcesDir = generated
+    querydslSourcesDir = querydslDir
 }
 sourceSets {
-    main.java.srcDir generated
+    main.java.srcDir querydslDir
 }
 
 compileQuerydsl{

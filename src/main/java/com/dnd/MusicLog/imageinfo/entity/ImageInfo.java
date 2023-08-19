@@ -20,7 +20,6 @@ public class ImageInfo extends BaseTimeEntity {
     @Column(name = "log_id", nullable = false)
     private long logId;
 
-
     @Column(name = "image_name", nullable = false)
     private String imageName;
 

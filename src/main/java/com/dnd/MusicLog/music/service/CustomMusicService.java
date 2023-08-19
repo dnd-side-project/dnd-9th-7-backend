@@ -78,4 +78,18 @@ public class CustomMusicService {
 
         return new CustomMusicResponseDto(music);
     }
+
+    @Transactional
+    public CustomMusicResponseDto deleteCustomMusic(long userId, long customMusicId) {
+        User user = oAuthLoginService.getUser(userId);
+
+        CustomMusic music = customMusicRepository.findByIdAndAuthor(customMusicId, user)
+            .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
+
+        CustomMusicResponseDto response = new CustomMusicResponseDto(music);
+
+        customMusicRepository.delete(music);
+
+        return response;
+    }
 }

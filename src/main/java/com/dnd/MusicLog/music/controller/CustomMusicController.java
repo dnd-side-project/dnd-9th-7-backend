@@ -7,7 +7,6 @@ import com.dnd.MusicLog.music.dto.CustomMusicItem;
 import com.dnd.MusicLog.music.dto.SaveCustomMusicRequestDto;
 import com.dnd.MusicLog.music.dto.SaveCustomMusicResponseDto;
 import com.dnd.MusicLog.music.dto.SearchCustomMusicResponseDto;
-import com.dnd.MusicLog.music.dto.SpotifyTrackResponseDto;
 import com.dnd.MusicLog.music.service.MusicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,21 +21,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/music")
+@RequestMapping("/api/music/custom")
 @RestController
-public class MusicController extends BaseController {
+public class CustomMusicController extends BaseController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final MusicService musicService;
 
-    @GetMapping("/spotify")
-    public SpotifyTrackResponseDto searchSpotifyMusic(
-        @RequestParam("query") String query,
-        @RequestParam("offset") int offset) {
-        return musicService.searchSpotifyMusic(query, offset);
-    }
-
-    @GetMapping("/custom")
+    @GetMapping("")
     public ResponseEntity<BaseResponse<SearchCustomMusicResponseDto>> searchCustomMusic(
         @RequestHeader(name = "Authorization") String token,
         @RequestParam(value = "query") String query,
@@ -51,7 +43,7 @@ public class MusicController extends BaseController {
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 검색 성공", response);
     }
 
-    @GetMapping("/custom/{customMusicId}")
+    @GetMapping("/{customMusicId}")
     public ResponseEntity<BaseResponse<CustomMusicItem>> searchCustomMusic(
         @RequestHeader(name = "Authorization") String token,
         @PathVariable(name = "customMusicId") long customMusicId) {
@@ -63,7 +55,7 @@ public class MusicController extends BaseController {
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 검색 성공", response);
     }
 
-    @PostMapping("/custom")
+    @PostMapping("")
     public ResponseEntity<BaseResponse<SaveCustomMusicResponseDto>> saveCustomMusic(
         @RequestHeader(name = "Authorization") String token,
         @RequestBody SaveCustomMusicRequestDto saveCustomMusicRequestDto) {

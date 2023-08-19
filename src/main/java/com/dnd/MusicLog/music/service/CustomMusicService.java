@@ -3,8 +3,8 @@ package com.dnd.MusicLog.music.service;
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
 import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import com.dnd.MusicLog.music.dto.CustomMusicItem;
-import com.dnd.MusicLog.music.dto.SaveCustomMusicRequestDto;
-import com.dnd.MusicLog.music.dto.SaveCustomMusicResponseDto;
+import com.dnd.MusicLog.music.dto.CustomMusicRequestDto;
+import com.dnd.MusicLog.music.dto.CustomMusicResponseDto;
 import com.dnd.MusicLog.music.dto.SearchCustomMusicResponseDto;
 import com.dnd.MusicLog.music.entity.custom.CustomMusic;
 import com.dnd.MusicLog.music.repository.custom.CustomMusicRepository;
@@ -49,7 +49,7 @@ public class CustomMusicService {
     }
 
     @Transactional
-    public SaveCustomMusicResponseDto saveCustomMusic(long userId, SaveCustomMusicRequestDto requestDto) {
+    public CustomMusicResponseDto saveCustomMusic(long userId, CustomMusicRequestDto requestDto) {
         User user = oAuthLoginService.getUser(userId);
 
         CustomMusic customMusic = CustomMusic.builder()
@@ -61,14 +61,14 @@ public class CustomMusicService {
 
         customMusicRepository.save(customMusic);
 
-        return new SaveCustomMusicResponseDto(customMusic);
+        return new CustomMusicResponseDto(customMusic);
     }
 
     @Transactional
-    public SaveCustomMusicResponseDto updateCustomMusic(
+    public CustomMusicResponseDto updateCustomMusic(
         long userId,
         long customMusicId,
-        SaveCustomMusicRequestDto request) {
+        CustomMusicRequestDto request) {
         User user = oAuthLoginService.getUser(userId);
 
         CustomMusic music = customMusicRepository.findByIdAndAuthor(customMusicId, user)
@@ -76,6 +76,6 @@ public class CustomMusicService {
 
         music.updateStaticInfo(request.name(), request.artist(), request.imageUrl());
 
-        return new SaveCustomMusicResponseDto(music);
+        return new CustomMusicResponseDto(music);
     }
 }

@@ -4,6 +4,7 @@ import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.common.SuccessResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
+import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
 import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,10 +23,10 @@ public class ImageInfoController extends BaseController {
     private final ImageInfoService imageInfoService;
 
     @PostMapping("/image")
-    public ResponseEntity<BaseResponse<List<String>>> uploadImages(@RequestHeader(name = "Authorization") String bearerToken,
-                                                                   @RequestPart("images") List<MultipartFile> multipartFile) {
+    public ResponseEntity<BaseResponse<FileNamesResponseDto>> uploadImages(@RequestHeader(name = "Authorization") String bearerToken,
+                                                                           @RequestPart("images") List<MultipartFile> multipartFile) {
         jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        List<String> responseDto = imageInfoService.uploadImages(multipartFile);
+        FileNamesResponseDto responseDto = imageInfoService.uploadImages(multipartFile);
         return createBaseResponse(HttpStatus.CREATED, "이미지 저장 완료", responseDto);
     }
 
@@ -38,9 +39,9 @@ public class ImageInfoController extends BaseController {
     }
 
     @GetMapping("/image")
-    public ResponseEntity<BaseResponse<List<String>>> searchImages(@RequestHeader(name = "Authorization") String bearerToken) {
+    public ResponseEntity<BaseResponse<FileNamesResponseDto>> searchImages(@RequestHeader(name = "Authorization") String bearerToken) {
         jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        List<String> responseDto = imageInfoService.searchImages(1);
+        FileNamesResponseDto responseDto = imageInfoService.searchImages(1);
         return createBaseResponse(HttpStatus.OK, "이미지 조회 완료", responseDto);
     }
 }

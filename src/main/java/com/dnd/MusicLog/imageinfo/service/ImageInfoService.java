@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
 import com.dnd.MusicLog.global.error.exception.ErrorCode;
+import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
 import com.dnd.MusicLog.imageinfo.entity.ImageInfo;
 import com.dnd.MusicLog.imageinfo.repository.ImageInfoRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class ImageInfoService {
     private final ImageInfoRepository imageInfoRepository;
 
     @Transactional
-    public List<String> uploadImages(List<MultipartFile> multipartFile) {
+    public FileNamesResponseDto uploadImages(List<MultipartFile> multipartFile) {
 
         if (multipartFile.size() > 10) {
             throw new BusinessLogicException(ErrorCode.BAD_REQUEST_MULTIPART);
@@ -70,7 +71,10 @@ public class ImageInfoService {
 
         imageInfoRepository.saveAll(imageInfoList);
 
-        return fileNameList;
+        return FileNamesResponseDto.builder()
+            .fileNames(fileNameList)
+            .build();
+
     }
 
     @Transactional
@@ -84,7 +88,7 @@ public class ImageInfoService {
     }
 
     // TODO : 로그 테이블 생성 후 조인을 이용할 예정
-    public List<String> searchImages(long logId) {
+    public FileNamesResponseDto searchImages(long logId) {
         List<ImageInfo> imageInfoList = imageInfoRepository.findAllByLogId(logId);
 
         if (imageInfoList.isEmpty()) {
@@ -97,7 +101,9 @@ public class ImageInfoService {
             fileNameList.add(imageInfo.getImageName());
         });
 
-        return fileNameList;
+        return FileNamesResponseDto.builder()
+            .fileNames(fileNameList)
+            .build();
     }
 
     private String createFileName(String fileName, String dirName) {

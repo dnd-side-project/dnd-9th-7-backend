@@ -19,14 +19,14 @@ import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-class MusicServiceTest {
+class CustomMusicServiceTest {
 
-    private final MusicService musicService;
+    private final CustomMusicService customMusicService;
     private final UserRepository userRepository;
 
     @Autowired
-    public MusicServiceTest(MusicService musicService, UserRepository userRepository) {
-        this.musicService = musicService;
+    public CustomMusicServiceTest(CustomMusicService customMusicService, UserRepository userRepository) {
+        this.customMusicService = customMusicService;
         this.userRepository = userRepository;
     }
 
@@ -61,9 +61,9 @@ class MusicServiceTest {
         SaveCustomMusicRequestDto customMusic03 =
             new SaveCustomMusicRequestDto("hello03", "hello03", "newjeans03");
 
-        musicService.saveCustomMusic(1, customMusic01);
-        musicService.saveCustomMusic(1, customMusic02);
-        musicService.saveCustomMusic(1, customMusic03);
+        customMusicService.saveCustomMusic(1, customMusic01);
+        customMusicService.saveCustomMusic(1, customMusic02);
+        customMusicService.saveCustomMusic(1, customMusic03);
     }
 
     @DisplayName("음악 조회 로직 테스트")
@@ -74,39 +74,39 @@ class MusicServiceTest {
         @DisplayName("hello 이름이 포함된 음악이 검색된다.")
         @Test
         void searchHelloSuccess() {
-            SearchCustomMusicResponseDto response = musicService.searchCustomMusic(1, "hello", 0, 10);
+            SearchCustomMusicResponseDto response = customMusicService.searchCustomMusic(1, "hello", 0, 10);
             assertThat(response.items()).isNotEmpty();
         }
 
         @DisplayName("검색 시 size 값이 2라면 최대 2개만 반환된다.")
         @Test
         void searchHelloWithSize2() {
-            SearchCustomMusicResponseDto response01 = musicService.searchCustomMusic(1, "hello", 0, 2);
+            SearchCustomMusicResponseDto response01 = customMusicService.searchCustomMusic(1, "hello", 0, 2);
             assertThat(response01.items().size()).isEqualTo(2);
-            SearchCustomMusicResponseDto response02 = musicService.searchCustomMusic(1, "hello", 1, 2);
+            SearchCustomMusicResponseDto response02 = customMusicService.searchCustomMusic(1, "hello", 1, 2);
             assertThat(response02.items().size()).isEqualTo(1);
-            SearchCustomMusicResponseDto response03 = musicService.searchCustomMusic(1, "hello", 2, 2);
+            SearchCustomMusicResponseDto response03 = customMusicService.searchCustomMusic(1, "hello", 2, 2);
             assertThat(response03.items()).isEmpty();
         }
 
         @DisplayName("hello01 이름을 가진 음악은 1개만 존재한다.")
         @Test
         void searchHello01ResponseOneObject() {
-            SearchCustomMusicResponseDto response = musicService.searchCustomMusic(1, "hello01", 0, 10);
+            SearchCustomMusicResponseDto response = customMusicService.searchCustomMusic(1, "hello01", 0, 10);
             assertThat(response.items().size()).isEqualTo(1);
         }
 
         @DisplayName("userId가 2일 때는 검색 결과가 존재하지 않는다.")
         @Test
         void searchHelloWithUserId2() {
-            SearchCustomMusicResponseDto response = musicService.searchCustomMusic(2, "hello", 0, 10);
+            SearchCustomMusicResponseDto response = customMusicService.searchCustomMusic(2, "hello", 0, 10);
             assertThat(response.items()).isEmpty();
         }
 
         @DisplayName("userId 와 customMusicId 로 음악을 검색하는데 성공한다.")
         @Test
         void searchByUserIdAndCustomMusicId() {
-            CustomMusicItem response = musicService.searchCustomMusic(1, 1);
+            CustomMusicItem response = customMusicService.searchCustomMusic(1, 1);
             assertThat(response.getName()).isEqualTo("hello01");
             assertThat(response.getImageUrl()).isEqualTo("hello01");
             assertThat(response.getArtist()).isEqualTo("newjeans01");
@@ -115,7 +115,7 @@ class MusicServiceTest {
         @DisplayName("userId가 일치하지 않으면 존재하지 않는 리소스 에러가 발생한다.")
         @Test
         void searchByIdWithInvalidAuthor() {
-            assertThatThrownBy(() -> musicService.searchCustomMusic(2, 1))
+            assertThatThrownBy(() -> customMusicService.searchCustomMusic(2, 1))
                 .isInstanceOf(BusinessLogicException.class);
         }
     }

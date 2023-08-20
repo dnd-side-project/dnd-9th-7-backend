@@ -31,10 +31,10 @@ public class TagInfoService {
 
         TagInfo tagInfo = TagInfo.builder()
             .logId(1) // TODO : 로그 엔티티 생성 후 수정 예정
-            .feeling(Feeling.valueOf(tag.feeling()))
-            .time(Time.valueOf(tag.time()))
-            .weather(Weather.valueOf(tag.weather()))
-            .season(Season.valueOf(tag.season()))
+            .feeling(tag.feeling())
+            .time(tag.time())
+            .weather(tag.weather())
+            .season(tag.season())
             .build();
 
         tagInfoRepository.save(tagInfo);

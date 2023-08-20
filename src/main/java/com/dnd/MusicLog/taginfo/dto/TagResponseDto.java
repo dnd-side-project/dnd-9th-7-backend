@@ -1,20 +1,24 @@
 package com.dnd.MusicLog.taginfo.dto;
 
 import com.dnd.MusicLog.taginfo.entity.TagInfo;
+import com.dnd.MusicLog.taginfo.enums.Feeling;
+import com.dnd.MusicLog.taginfo.enums.Season;
+import com.dnd.MusicLog.taginfo.enums.Time;
+import com.dnd.MusicLog.taginfo.enums.Weather;
 import lombok.Value;
 
 @Value
 public class TagResponseDto {
 
-    String feeling;
-    String time;
-    String weather;
-    String season;
+    Feeling feeling;
+    Time time;
+    Weather weather;
+    Season season;
 
     public TagResponseDto(TagInfo tagInfo) {
-        this.feeling = String.valueOf(tagInfo.getFeeling());
-        this.time = String.valueOf(tagInfo.getTime());
-        this.weather = String.valueOf(tagInfo.getWeather());
-        this.season = String.valueOf(tagInfo.getSeason());
+        this.feeling = tagInfo.getFeeling();
+        this.time = tagInfo.getTime();
+        this.weather = tagInfo.getWeather();
+        this.season = tagInfo.getSeason();
     }
 }

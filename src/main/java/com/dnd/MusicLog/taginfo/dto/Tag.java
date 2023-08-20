@@ -1,4 +1,9 @@
 package com.dnd.MusicLog.taginfo.dto;
 
-public record Tag(String feeling, String time, String weather, String season) {
+import com.dnd.MusicLog.taginfo.enums.Feeling;
+import com.dnd.MusicLog.taginfo.enums.Season;
+import com.dnd.MusicLog.taginfo.enums.Time;
+import com.dnd.MusicLog.taginfo.enums.Weather;
+
+public record Tag(Feeling feeling, Time time, Weather weather, Season season) {
 }

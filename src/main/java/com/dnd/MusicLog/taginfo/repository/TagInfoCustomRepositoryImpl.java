@@ -36,16 +36,16 @@ public class TagInfoCustomRepositoryImpl implements TagInfoCustomRepository{
 
     }
 
-    private BooleanExpression feelingEq(String feeling) {
-        return hasText(feeling) ? tagInfo.feeling.eq(Feeling.valueOf(feeling)) : null;
+    private BooleanExpression feelingEq(Feeling feeling) {
+        return hasText(String.valueOf(feeling)) ? tagInfo.feeling.eq(feeling) : null;
     }
-    private BooleanExpression timeEq(String time) {
-        return hasText(time) ? tagInfo.time.eq(Time.valueOf(time)) : null;
+    private BooleanExpression timeEq(Time time) {
+        return hasText(String.valueOf(time)) ? tagInfo.time.eq(time) : null;
     }
-    private BooleanExpression weatherEq(String weather) {
-        return hasText(weather) ? tagInfo.weather.eq(Weather.valueOf(weather)) : null;
+    private BooleanExpression weatherEq(Weather weather) {
+        return hasText(String.valueOf(weather)) ? tagInfo.weather.eq(weather) : null;
     }
-    private BooleanExpression seasonEq(String season) {
-        return hasText(season) ? tagInfo.season.eq(Season.valueOf(season)) : null;
+    private BooleanExpression seasonEq(Season season) {
+        return hasText(String.valueOf(season)) ? tagInfo.season.eq(season) : null;
     }
 }

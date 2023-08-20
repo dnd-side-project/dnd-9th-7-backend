@@ -38,7 +38,7 @@ class TagInfoServiceTest {
     @DisplayName("태그 정보 저장 성공 테스트")
     void saveTagTest() {
 
-        Tag tag = new Tag("행복", "아침", "맑음", "봄");
+        Tag tag = new Tag(Feeling.FLUTTER,Time.DAWN,Weather.RAIN,Season.SPRING);
 
         TagResponseDto responseDto = tagInfoService.saveTag(tag);
         assertThat(responseDto).isNotNull();
@@ -51,10 +51,10 @@ class TagInfoServiceTest {
 
         TagInfo tagInfo = TagInfo.builder()
             .logId(10000) // TODO : 로그 엔티티 생성 후 수정 예정
-            .feeling(Feeling.공허)
-            .time(Time.점심)
-            .weather(Weather.눈)
-            .season(Season.여름)
+            .feeling(Feeling.FLUTTER)
+            .time(Time.DAWN)
+            .weather(Weather.RAIN)
+            .season(Season.SPRING)
             .build();
 
         tagInfoRepository.save(tagInfo);
@@ -69,17 +69,17 @@ class TagInfoServiceTest {
     @DisplayName("태그별 조회 성공 테스트")
     void searchTagByTagTest() {
 
-        Tag tag = new Tag("행복", "아침", "맑음", "봄");
+        Tag tag = new Tag(Feeling.FLUTTER, Time.DAWN, Weather.RAIN, Season.SPRING);
 
         TagResponseDto responseDto = tagInfoService.saveTag(tag);
 
-        Tag tag1 = new Tag(null, null, null, "봄");
+        Tag tag1 = new Tag(Feeling.FLUTTER, null, null, null);
         List<TagInfo> tagInfos1 = tagInfoCustomRepository.searchTagInfoByCategory(tag1);
-        Tag tag2 = new Tag("행복", null, null, null);
+        Tag tag2 = new Tag(null, Time.DAWN, null, null);
         List<TagInfo> tagInfos2 = tagInfoCustomRepository.searchTagInfoByCategory(tag2);
-        Tag tag3 = new Tag(null, "아침", null, null);
+        Tag tag3 = new Tag(null, null, Weather.RAIN, null);
         List<TagInfo> tagInfos3 = tagInfoCustomRepository.searchTagInfoByCategory(tag3);
-        Tag tag4 = new Tag(null, null, "맑음", null);
+        Tag tag4 = new Tag(null, null, null, Season.SPRING);
         List<TagInfo> tagInfos4 = tagInfoCustomRepository.searchTagInfoByCategory(tag4);
 
         assertThat(tagInfos1).isNotNull();

@@ -42,3 +42,6 @@ out/
 ### Yml ###
 src/main/resources/application.yml
 src/test/resources/application.yml
+
+### Querydsl
+/src/main/generated

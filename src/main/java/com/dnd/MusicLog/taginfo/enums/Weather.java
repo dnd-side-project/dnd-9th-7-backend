@@ -9,10 +9,10 @@ import lombok.Getter;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Weather {
 
-    맑음("59FFCD"),
-    흐림("5897AC"),
-    비("128A92"),
-    눈("ACF2E6");
+    SUNNY("59FFCD"),
+    CLOUDY("5897AC"),
+    RAIN("128A92"),
+    SNOW("ACF2E6");
 
     private String color;
 }

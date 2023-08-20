@@ -9,10 +9,10 @@ import lombok.Getter;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Time {
 
-    아침("E9FFAC"),
-    점심("CAED66"),
-    저녁("1F489A"),
-    새벽("3D33AA");
+    MORNING("E9FFAC"),
+    LUNCH("CAED66"),
+    DINNER("1F489A"),
+    DAWN("3D33AA");
 
     private String color;
 }

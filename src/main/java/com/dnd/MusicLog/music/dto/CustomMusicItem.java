@@ -4,17 +4,17 @@ import com.dnd.MusicLog.music.entity.custom.CustomMusic;
 import lombok.Value;
 
 @Value
-public class SaveCustomMusicResponseDto {
+public class CustomMusicItem {
 
     long id;
     String name;
-    String imageUrl;
     String artist;
+    String imageUrl;
 
-    public SaveCustomMusicResponseDto(CustomMusic customMusic) {
+    public CustomMusicItem(CustomMusic customMusic) {
         this.id = customMusic.getId();
         this.name = customMusic.getName();
-        this.imageUrl = customMusic.getImageUrl();
         this.artist = customMusic.getArtist();
+        this.imageUrl = customMusic.getImageUrl();
     }
 }

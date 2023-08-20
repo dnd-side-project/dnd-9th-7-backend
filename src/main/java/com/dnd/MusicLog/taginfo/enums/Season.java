@@ -9,10 +9,10 @@ import lombok.Getter;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Season {
 
-    봄("BDFF89"),
-    여름("4290EC"),
-    가을("FDF8DC"),
-    겨울("AEF2FF");
+    SPRING("BDFF89"),
+    SUMMER("4290EC"),
+    AUTUMN("FDF8DC"),
+    WINTER("AEF2FF");
 
     private String color;
 }

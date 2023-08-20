@@ -9,14 +9,14 @@ import lombok.Getter;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Feeling {
 
-    행복("00C2FF"),
-    신남("7744E4"),
-    설렘("DB75FF"),
-    평온("4CBD87"),
-    공허("04002D"),
-    우울("35516C"),
-    슬픔("2D7ECA"),
-    분노("AA465A");
+    HAPPINESS("00C2FF"), // 행복
+    EXCITEMENT("7744E4"), // 신남
+    FLUTTER("DB75FF"), // 설렘
+    SERENITY("4CBD87"), // 평온
+    EMPTINESS("04002D"), // 공허
+    DEPRESSION("35516C"), // 우울
+    SADNESS("2D7ECA"), // 슬픔
+    ANGER("AA465A"); // 분노
 
     private String color;
 }

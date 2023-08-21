@@ -1,5 +1,6 @@
 package com.dnd.MusicLog.music.service;
 
+import com.dnd.MusicLog.music.dto.SpotifyItem;
 import com.dnd.MusicLog.music.dto.SpotifyTokenResponseDto;
 import com.dnd.MusicLog.music.dto.SpotifyTrackResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ public class SpotifyMusicService {
 
     private static final String TOKEN_REQUEST_URL = "https://accounts.spotify.com/api/token";
     private static final String SEARCH_REQUEST_URL = "https://api.spotify.com/v1/search";
+    private static final String SEARCH_TRACK_REQUEST_URL = "https://api.spotify.com/v1/tracks/";
 
     private final WebClient webClient;
 
@@ -24,11 +26,11 @@ public class SpotifyMusicService {
     @Value("${spotify.client.secret}")
     private String SPOTIFY_CLIENT_SECRET;
 
-    public SpotifyTrackResponseDto searchSpotifyMusic(String query, int offset) {
+    public SpotifyTrackResponseDto searchSpotifyTrackList(String query, int offset) {
         SpotifyTokenResponseDto spotifyTokenResponseDto = getToken();
         String accessToken = spotifyTokenResponseDto.accessToken();
 
-        String queryString = getQueryString(query, offset);
+        String queryString = createSearchTrackListQueryString(query, offset);
 
         return webClient.get()
             .uri(SEARCH_REQUEST_URL + queryString)
@@ -38,13 +40,32 @@ public class SpotifyMusicService {
             .block();
     }
 
+    public SpotifyItem searchSpotifyTrack(String spotifyId) {
+        SpotifyTokenResponseDto spotifyTokenResponseDto = getToken();
+        String accessToken = spotifyTokenResponseDto.accessToken();
+
+        String queryString = createSearchTrackQueryString(spotifyId);
+
+        return webClient.get()
+            .uri(SEARCH_TRACK_REQUEST_URL + queryString)
+            .header("Authorization", "Bearer " + accessToken)
+            .retrieve()
+            .bodyToMono(SpotifyItem.class)
+            .block();
+    }
+
     // type, market, limit 은 정책에 따라 수정
-    private String getQueryString(String query, int offset) {
+    private String createSearchTrackListQueryString(String query, int offset) {
         return "?q="
             + query
             + "&offset="
             + offset
             + "&type=track&market=KR&limit=10";
+    }
+
+    private String createSearchTrackQueryString(String spotifyId) {
+        return spotifyId
+            + "?market=KR";
     }
 
     private SpotifyTokenResponseDto getToken() {

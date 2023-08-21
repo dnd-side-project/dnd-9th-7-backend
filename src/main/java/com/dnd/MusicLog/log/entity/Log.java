@@ -4,6 +4,7 @@ import com.dnd.MusicLog.global.common.BaseTimeEntity;
 import com.dnd.MusicLog.music.entity.spotify.SpotifyMusic;
 import com.dnd.MusicLog.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -41,4 +42,15 @@ public class Log extends BaseTimeEntity {
     @Column(name = "date", nullable = false)
     private Date date;
 
+    @Builder
+    public Log(User user, SpotifyMusic spotifyMusic, String location, String record, String review, String youtubeId, Boolean temp, Date date) {
+        this.user = user;
+        this.spotifyMusic = spotifyMusic;
+        this.location = location;
+        this.record = record;
+        this.review = review;
+        this.youtubeId = youtubeId;
+        this.temp = temp;
+        this.date = date;
+    }
 }

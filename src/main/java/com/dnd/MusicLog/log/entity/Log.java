@@ -42,7 +42,7 @@ public class Log extends BaseTimeEntity {
     private String youtubeId;
 
     @Column(name = "temp", nullable = false)
-    private Boolean temp;
+    private boolean temp;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date", nullable = false)
@@ -53,14 +53,17 @@ public class Log extends BaseTimeEntity {
     private MusicType musicType;
 
     @Builder
-    public Log(User user, SpotifyMusic spotifyMusic, String location, String record, String review, String youtubeId, Boolean temp, Date date) {
+    public Log(User user, SpotifyMusic spotifyMusic, CustomMusic customMusic, String location, String record,
+               String review, String youtubeId, Boolean temp, Date date, MusicType musicType) {
         this.user = user;
         this.spotifyMusic = spotifyMusic;
+        this.customMusic = customMusic;
         this.location = location;
         this.record = record;
         this.review = review;
         this.youtubeId = youtubeId;
         this.temp = temp;
         this.date = date;
+        this.musicType = musicType;
     }
 }

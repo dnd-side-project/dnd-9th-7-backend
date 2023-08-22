@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,4 +30,12 @@ public class SpotifyAlbum extends BaseTimeEntity {
 
     @Column(name = "release_date")
     private String releaseDate;
+
+    @Builder
+    public SpotifyAlbum(String name, String spotifyId, String imageUrl, String releaseDate) {
+        this.name = name;
+        this.spotifyId = spotifyId;
+        this.imageUrl = imageUrl;
+        this.releaseDate = releaseDate;
+    }
 }

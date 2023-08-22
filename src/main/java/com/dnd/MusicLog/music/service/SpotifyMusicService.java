@@ -14,6 +14,7 @@ import com.dnd.MusicLog.music.repository.spotify.SpotifyAlbumRepository;
 import com.dnd.MusicLog.music.repository.spotify.SpotifyArtistRepository;
 import com.dnd.MusicLog.music.repository.spotify.SpotifyMusicArtistRelationRepository;
 import com.dnd.MusicLog.music.repository.spotify.SpotifyMusicRepository;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -67,32 +68,112 @@ public class SpotifyMusicService {
             return searchSpotifyTrackInRepository(spotifyMusicOptional.get());
         }
 
-        // TODO: 반환하기 전 repository 에 저장하는 로직 구성 필요
-        return searchSpotifyTrackByAPI(spotifyId);
+        SpotifyItemResponse itemResponse = searchSpotifyTrackByAPI(spotifyId);
+        List<SpotifyArtistResponse> artistsResponse = itemResponse.artists();
+        SpotifyAlbumResponse albumResponse = itemResponse.album();
+
+        SpotifyMusic music = SpotifyMusic.builder()
+            .spotifyId(itemResponse.id())
+            .name(itemResponse.name())
+            .build();
+
+        musicRepository.save(music);
+
+        SpotifyAlbum album = getOrCreateSpotifyAlbum(albumResponse);
+
+        List<SpotifyArtist> artists = artistsResponse.stream()
+            .map(this::getOrCreateSpotifyArtist)
+            .toList();
+
+        music.intoAlbum(album);
+        artists.forEach(artist -> {
+            SpotifyMusicArtistRelation relation = SpotifyMusicArtistRelation.builder()
+                .artist(artist)
+                .music(music)
+                .build();
+            relationRepository.save(relation);
+        });
+
+        return searchSpotifyTrackInRepository(music);
     }
 
     private SpotifyItemResponse searchSpotifyTrackInRepository(SpotifyMusic spotifyMusic) {
         SpotifyAlbum album = spotifyMusic.getAlbum();
-        SpotifyImageResponse albumImage = new SpotifyImageResponse(album.getImageUrl(), 0, 0);
+        List<SpotifyImageResponse> albumImageResponse = imageUrlToResponse(album.getImageUrl());
         SpotifyAlbumResponse spotifyAlbumResponse =
             new SpotifyAlbumResponse(
                 album.getSpotifyId(),
                 album.getName(),
                 album.getReleaseDate(),
-                List.of(albumImage));
+                albumImageResponse);
 
         List<SpotifyMusicArtistRelation> relations = relationRepository.findAllByMusic(spotifyMusic);
-        List<SpotifyArtistResponse> spotifyArtistResponses = relations.stream().map(relation -> {
-            SpotifyArtist artist = relation.getArtist();
-            SpotifyImageResponse image = new SpotifyImageResponse(artist.getImageUrl(), 0, 0);
-            return new SpotifyArtistResponse(artist.getSpotifyId(), artist.getName(), List.of(image));
-        }).toList();
+        List<SpotifyArtistResponse> spotifyArtistResponses = relations.stream()
+            .map(relation -> {
+                SpotifyArtist artist = relation.getArtist();
+                List<SpotifyImageResponse> artistImageResponse = imageUrlToResponse(artist.getImageUrl());
+                return new SpotifyArtistResponse(artist.getSpotifyId(), artist.getName(), artistImageResponse);
+            }).toList();
 
         return new SpotifyItemResponse(
             spotifyMusic.getSpotifyId(),
             spotifyMusic.getName(),
             spotifyAlbumResponse,
             spotifyArtistResponses);
+    }
+
+    private SpotifyAlbum getOrCreateSpotifyAlbum(SpotifyAlbumResponse spotifyAlbumResponse) {
+        Optional<SpotifyAlbum> spotifyAlbumOptional =
+            albumRepository.findBySpotifyId(spotifyAlbumResponse.id());
+
+        if (spotifyAlbumOptional.isPresent()) {
+            return spotifyAlbumOptional.get();
+        }
+
+        SpotifyImageResponse image = Optional.ofNullable(spotifyAlbumResponse.images())
+            .orElse(List.of())
+            .stream()
+            .max(Comparator.comparingInt(SpotifyImageResponse::width))
+            .orElse(null);
+
+        SpotifyAlbum album = SpotifyAlbum.builder()
+            .spotifyId(spotifyAlbumResponse.id())
+            .name(spotifyAlbumResponse.name())
+            .imageUrl(image != null ? image.url() : null)
+            .releaseDate(spotifyAlbumResponse.releaseDate())
+            .build();
+
+        return albumRepository.save(album);
+    }
+
+    private SpotifyArtist getOrCreateSpotifyArtist(SpotifyArtistResponse spotifyArtistResponse) {
+        Optional<SpotifyArtist> spotifyArtistOptional = artistRepository.findBySpotifyId(spotifyArtistResponse.id());
+
+        if (spotifyArtistOptional.isPresent()) {
+            return spotifyArtistOptional.get();
+        }
+
+        SpotifyImageResponse image = Optional.ofNullable(spotifyArtistResponse.images())
+            .orElse(List.of())
+            .stream()
+            .max(Comparator.comparingInt(SpotifyImageResponse::width))
+            .orElse(null);
+
+        SpotifyArtist artist = SpotifyArtist.builder()
+            .spotifyId(spotifyArtistResponse.id())
+            .name(spotifyArtistResponse.name())
+            .imageUrl(image != null ? image.url() : null)
+            .build();
+
+        return artistRepository.save(artist);
+    }
+
+
+    private List<SpotifyImageResponse> imageUrlToResponse(String imageUrl) {
+        if (imageUrl == null) {
+            return List.of();
+        }
+        return List.of(new SpotifyImageResponse(imageUrl, 0, 0));
     }
 
     private SpotifyItemResponse searchSpotifyTrackByAPI(String spotifyId) {

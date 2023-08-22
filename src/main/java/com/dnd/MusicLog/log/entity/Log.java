@@ -3,6 +3,7 @@ package com.dnd.MusicLog.log.entity;
 import com.dnd.MusicLog.global.common.BaseTimeEntity;
 import com.dnd.MusicLog.music.entity.custom.CustomMusic;
 import com.dnd.MusicLog.music.entity.spotify.SpotifyMusic;
+import com.dnd.MusicLog.music.enums.MusicType;
 import com.dnd.MusicLog.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -47,11 +48,25 @@ public class Log extends BaseTimeEntity {
     @Column(name = "date", nullable = false)
     private Date date;
 
-    @Builder
-    public Log(User user, SpotifyMusic spotifyMusic, CustomMusic customMusic, String location, String record,
-               String review, String youtubeId, Boolean temp, Date date) {
+    @Column(name = "music_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MusicType musicType;
+
+    //로그 with 스포티파이
+    public Log(User user, SpotifyMusic spotifyMusic, String location, String record, String review, String youtubeId, boolean temp, Date date, MusicType musicType) {
         this.user = user;
         this.spotifyMusic = spotifyMusic;
+        this.location = location;
+        this.record = record;
+        this.review = review;
+        this.youtubeId = youtubeId;
+        this.temp = temp;
+        this.date = date;
+        this.musicType = musicType;
+    }
+    //로그 with 커스텀
+    public Log(User user, CustomMusic customMusic, String location, String record, String review, String youtubeId, boolean temp, Date date, MusicType musicType) {
+        this.user = user;
         this.customMusic = customMusic;
         this.location = location;
         this.record = record;
@@ -59,5 +74,6 @@ public class Log extends BaseTimeEntity {
         this.youtubeId = youtubeId;
         this.temp = temp;
         this.date = date;
+        this.musicType = musicType;
     }
 }

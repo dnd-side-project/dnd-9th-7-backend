@@ -62,4 +62,12 @@ public class Log extends BaseTimeEntity {
         this.musicType = musicType;
     }
 
+    public void setSpotifyMusic(SpotifyMusic spotifyMusic){
+        this.spotifyMusic = spotifyMusic;
+    }
+
+    public void setCustomMusic(CustomMusic customMusic){
+        this.customMusic = customMusic;
+    }
+
 }

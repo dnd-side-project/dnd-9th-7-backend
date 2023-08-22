@@ -41,12 +41,12 @@ public class LogService {
         //로그 with 스포티파이
         if (requestDto.musicType().equals(MusicType.SPOTIFY)) {
             //TODO : 스포티 파이 음악 정보 중복 검사 및 스포티파이 음악, 앨범, 아티스트 저장 로직 필요.
-            //TODO : 로그 인스턴스에 스포티파이 음악 세팅
+            //TODO : 로그 인스턴스에 스포티파이 음악 세팅 -> log.setSpotifyMusic(SpotifyMusic);
         }
         //로그 with 커스텀
         if (requestDto.musicType().equals(MusicType.CUSTOM)) {
             //TODO : 커스텀 음악 정보 중복 검사 및 커스텀 음악 저장 로직 필요.
-            //TODO : 로그 인스턴스에 커스텀음악 세팅
+            //TODO : 로그 인스턴스에 커스텀음악 세팅 -> log.setCustomMusic(CustomMusic);
         }
 
         long logId = logRepository.save(log).getId();

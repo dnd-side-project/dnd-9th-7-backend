@@ -23,11 +23,11 @@ public class ImageInfoController extends BaseController {
     private final ImageInfoService imageInfoService;
 
     @PostMapping("/image")
-    public ResponseEntity<BaseResponse<FileNamesResponseDto>> uploadImages(@RequestHeader(name = "Authorization") String bearerToken,
-                                                                           @RequestPart("images") List<MultipartFile> multipartFile) {
+    public ResponseEntity<BaseResponse<String>> uploadImage(@RequestHeader(name = "Authorization") String bearerToken,
+                                                                           @RequestPart("images") MultipartFile multipartFile) {
         jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        FileNamesResponseDto responseDto = imageInfoService.uploadImages(multipartFile);
-        return createBaseResponse(HttpStatus.CREATED, "이미지 저장 완료", responseDto);
+        String imageName = imageInfoService.uploadImage(multipartFile);
+        return createBaseResponse(HttpStatus.CREATED, "이미지 저장 완료", imageName);
     }
 
     @DeleteMapping("/image")

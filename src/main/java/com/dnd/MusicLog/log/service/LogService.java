@@ -2,6 +2,8 @@ package com.dnd.MusicLog.log.service;
 
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
 import com.dnd.MusicLog.global.error.exception.ErrorCode;
+import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
+import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
 import com.dnd.MusicLog.log.dto.SaveLogRequestDto;
 import com.dnd.MusicLog.log.entity.Log;
 import com.dnd.MusicLog.log.repository.LogRepository;
@@ -19,7 +21,9 @@ import com.dnd.MusicLog.user.service.OAuthLoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -28,10 +32,11 @@ public class LogService {
 
     private final OAuthLoginService oAuthLoginService;
     private final TagInfoService tagInfoService;
+    private final ImageInfoService imageInfoService;
     private final LogRepository logRepository;
 
     @Transactional
-    public void saveLog(long userId, SaveLogRequestDto requestDto) {
+    public void saveLog(long userId, SaveLogRequestDto requestDto, List<MultipartFile> multipartFile) {
         User user = oAuthLoginService.getUser(userId);
 
         // 공통 프로퍼티 부분
@@ -53,6 +58,8 @@ public class LogService {
 
         Tag tag = new Tag(requestDto.feeling(), requestDto.time(), requestDto.weather(), requestDto.season());
         long tagId = tagInfoService.saveTag(logId, tag);
+
+        FileNamesResponseDto responseDto = imageInfoService.uploadImages(logId, multipartFile);
 
     }
 }

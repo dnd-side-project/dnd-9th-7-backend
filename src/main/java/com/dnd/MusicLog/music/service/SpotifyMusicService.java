@@ -78,9 +78,7 @@ public class SpotifyMusicService {
             new SpotifyAlbumResponse(
                 album.getSpotifyId(),
                 album.getName(),
-                0,
                 album.getReleaseDate(),
-                "",
                 List.of(albumImage));
 
         List<SpotifyMusicArtistRelation> relations = relationRepository.findAllByMusic(spotifyMusic);

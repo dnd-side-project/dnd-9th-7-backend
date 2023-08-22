@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -43,15 +44,15 @@ public class Log extends BaseTimeEntity {
     @Column(name = "temp", nullable = false)
     private boolean temp;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     @Column(name = "date", nullable = false)
-    private Date date;
+    private LocalDate date;
 
     @Column(name = "music_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private MusicType musicType;
 
-    public Log(User user, String location, String record, String review, String youtubeId, boolean temp, Date date, MusicType musicType) {
+    public Log(User user, String location, String record, String review, String youtubeId, boolean temp, LocalDate date, MusicType musicType) {
         this.user = user;
         this.location = location;
         this.record = record;

@@ -7,11 +7,12 @@ import com.dnd.MusicLog.taginfo.enums.Time;
 import com.dnd.MusicLog.taginfo.enums.Weather;
 import jakarta.annotation.Nullable;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 //TODO : 스포티파이 음악 저장 시 필요한 속성들 추가 필요.
 public record SaveLogRequestDto(@Nullable String location, @Nullable String record,
-                                @Nullable String review, @Nullable String youtubeId, Date date, boolean temp,
+                                @Nullable String review, @Nullable String youtubeId, LocalDate date, boolean temp,
                                 Feeling feeling, Time time, Weather weather, Season season,
                                 String name, @Nullable String imageUrl, String artist, MusicType musicType) {
 }

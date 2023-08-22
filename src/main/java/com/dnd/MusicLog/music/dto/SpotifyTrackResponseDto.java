@@ -1,5 +1,5 @@
 package com.dnd.MusicLog.music.dto;
 
-public record SpotifyTrackResponseDto(SpotifyTrack tracks) {
+public record SpotifyTrackResponseDto(SpotifyTrackResponse tracks) {
 
 }

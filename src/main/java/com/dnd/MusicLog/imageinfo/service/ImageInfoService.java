@@ -10,6 +10,8 @@ import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
 import com.dnd.MusicLog.imageinfo.entity.ImageInfo;
 import com.dnd.MusicLog.imageinfo.repository.ImageInfoRepository;
+import com.dnd.MusicLog.log.entity.Log;
+import com.dnd.MusicLog.log.repository.LogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,10 +34,27 @@ public class ImageInfoService {
     private String bucket;
 
     private final AmazonS3 amazonS3;
+    private final LogRepository logRepository;
     private final ImageInfoRepository imageInfoRepository;
 
+    public String uploadImage(MultipartFile multipartFile) {
+        String fileName = createFileName(multipartFile.getOriginalFilename(), DIRECTORY_NAME);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(multipartFile.getSize());
+        objectMetadata.setContentType(multipartFile.getContentType());
+
+        try {
+            amazonS3.putObject(new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), objectMetadata)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+        } catch(IOException e) {
+            throw new BusinessLogicException(ErrorCode.SERVER_ERROR);
+        }
+
+        return fileName;
+    }
+
     @Transactional
-    public FileNamesResponseDto uploadImages(List<MultipartFile> multipartFile) {
+    public FileNamesResponseDto uploadImages(long logId, List<MultipartFile> multipartFile) {
 
         if (multipartFile.size() > 10) {
             throw new BusinessLogicException(ErrorCode.BAD_REQUEST_MULTIPART);
@@ -43,6 +62,10 @@ public class ImageInfoService {
 
         List<String> fileNameList = new ArrayList<>();
         List<ImageInfo> imageInfoList = new ArrayList<>();
+
+        Log log = logRepository.findById(logId).orElseThrow(() -> {
+            throw new BusinessLogicException(ErrorCode.NOT_FOUND);
+        });
 
         multipartFile.forEach(file -> {
             String fileName = createFileName(file.getOriginalFilename(), DIRECTORY_NAME);
@@ -62,7 +85,7 @@ public class ImageInfoService {
 
             // ImageInfo 객체 생성 후 리스트에 추가
             ImageInfo imageInfo = ImageInfo.builder()
-                .logId(1) // TODO : 로그 ID 값으로 지정, 로그 테이블과 연관관계 설정 후 변경예정.
+                .log(log)
                 .imageName(fileName)
                 .build();
 

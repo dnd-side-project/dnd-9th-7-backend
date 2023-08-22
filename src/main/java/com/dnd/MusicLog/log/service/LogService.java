@@ -52,7 +52,7 @@ public class LogService {
         long logId = logRepository.save(log).getId();
 
         Tag tag = new Tag(requestDto.feeling(), requestDto.time(), requestDto.weather(), requestDto.season());
-        tagInfoService.saveTag(logId, tag);
+        long tagId = tagInfoService.saveTag(logId, tag);
 
     }
 }

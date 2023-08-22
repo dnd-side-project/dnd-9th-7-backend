@@ -30,7 +30,7 @@ public class TagInfoService {
     private final LogRepository logRepository;
 
     @Transactional
-    public void saveTag(long logId, Tag tag) {
+    public long saveTag(long logId, Tag tag) {
 
         Log log = logRepository.findById(logId).orElseThrow(() -> {
             throw new BusinessLogicException(ErrorCode.NOT_FOUND);
@@ -44,7 +44,7 @@ public class TagInfoService {
             .season(tag.season())
             .build();
 
-        tagInfoRepository.save(tagInfo);
+        return tagInfoRepository.save(tagInfo).getId();
 
     }
 

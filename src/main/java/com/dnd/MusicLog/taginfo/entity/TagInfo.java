@@ -1,6 +1,7 @@
 package com.dnd.MusicLog.taginfo.entity;
 
 import com.dnd.MusicLog.global.common.BaseTimeEntity;
+import com.dnd.MusicLog.log.entity.Log;
 import com.dnd.MusicLog.taginfo.enums.Feeling;
 import com.dnd.MusicLog.taginfo.enums.Season;
 import com.dnd.MusicLog.taginfo.enums.Time;
@@ -20,9 +21,9 @@ public class TagInfo extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    // TODO : 로그 엔티티 생성 후 연관관계 설정할 것.
-    @Column(name = "log_id", nullable = false)
-    private long logId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "log_id")
+    private Log log;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -41,12 +42,11 @@ public class TagInfo extends BaseTimeEntity {
     private Season season;
 
     @Builder
-    public TagInfo(long logId, Feeling feeling, Time time, Weather weather, Season season) {
-        this.logId = logId;
+    public TagInfo(Log log, Feeling feeling, Time time, Weather weather, Season season) {
+        this.log = log;
         this.feeling = feeling;
         this.time = time;
         this.weather = weather;
         this.season = season;
     }
-
 }

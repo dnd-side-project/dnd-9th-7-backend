@@ -2,6 +2,8 @@ package com.dnd.MusicLog.taginfo.service;
 
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
 import com.dnd.MusicLog.global.error.exception.ErrorCode;
+import com.dnd.MusicLog.log.entity.Log;
+import com.dnd.MusicLog.log.repository.LogRepository;
 import com.dnd.MusicLog.taginfo.dto.Tag;
 import com.dnd.MusicLog.taginfo.dto.TagResponseDto;
 import com.dnd.MusicLog.taginfo.entity.TagInfo;
@@ -25,21 +27,24 @@ public class TagInfoService {
 
     private final TagInfoRepository tagInfoRepository;
     private final TagInfoCustomRepositoryImpl tagInfoCustomRepository;
+    private final LogRepository logRepository;
 
     @Transactional
-    public TagResponseDto saveTag(Tag tag) {
+    public long saveTag(long logId, Tag tag) {
+
+        Log log = logRepository.findById(logId).orElseThrow(() -> {
+            throw new BusinessLogicException(ErrorCode.NOT_FOUND);
+        });
 
         TagInfo tagInfo = TagInfo.builder()
-            .logId(1) // TODO : 로그 엔티티 생성 후 수정 예정
+            .log(log)
             .feeling(tag.feeling())
             .time(tag.time())
             .weather(tag.weather())
             .season(tag.season())
             .build();
 
-        tagInfoRepository.save(tagInfo);
-
-        return new TagResponseDto(tagInfo);
+        return tagInfoRepository.save(tagInfo).getId();
 
     }
 

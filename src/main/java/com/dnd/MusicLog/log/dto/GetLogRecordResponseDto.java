@@ -1,6 +1,6 @@
 package com.dnd.MusicLog.log.dto;
 
-import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
+import java.util.List;
 
-public record GetLogRecordResponseDto (String record, FileNamesResponseDto fileNames){
+public record GetLogRecordResponseDto (String record, List<String> fileNames){
 }

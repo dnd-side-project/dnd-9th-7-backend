@@ -65,6 +65,6 @@ public class LogService {
 
         List<String> fileNameList = imageInfoRepository.findAllByLogIdOrderByCreatedDateAsc(logId);
 
-        return new GetLogRecordResponseDto(log.getRecord(), new FileNamesResponseDto(fileNameList));
+        return new GetLogRecordResponseDto(log.getRecord(), fileNameList);
     }
 }

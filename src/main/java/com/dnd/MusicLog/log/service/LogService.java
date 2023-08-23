@@ -5,6 +5,7 @@ import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
 import com.dnd.MusicLog.imageinfo.repository.ImageInfoRepository;
 import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
+import com.dnd.MusicLog.log.dto.GetLogPlayResponseDto;
 import com.dnd.MusicLog.log.dto.GetLogRecordResponseDto;
 import com.dnd.MusicLog.log.dto.SaveLogRequestDto;
 import com.dnd.MusicLog.log.entity.Log;
@@ -67,4 +68,17 @@ public class LogService {
 
         return new GetLogRecordResponseDto(log.getRecord(), fileNameList);
     }
+
+    // 기록 보기 3페이지 - PLAY
+    @Transactional(readOnly = true)
+    public GetLogPlayResponseDto getLogPlay(long userId, long logId) {
+
+        Log log = logRepository.findByIdAndUserId(userId, logId).orElseThrow(() -> {
+            throw new BusinessLogicException(ErrorCode.NOT_FOUND);
+        });
+
+        return new GetLogPlayResponseDto(log.getTitle(), log.getChannelTitle(), log.getDate(), log.getYoutubeId());
+
+    }
+
 }

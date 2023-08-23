@@ -30,7 +30,7 @@ public class LogController extends BaseController {
     @PostMapping("")
     public ResponseEntity<SuccessResponse> saveLog(@RequestHeader(name = "Authorization") String bearerToken,
                                                               @RequestPart("images") List<MultipartFile> multipartFile,
-                                                              @RequestBody SaveLogRequestDto requestDto) {
+                                                              @RequestPart("saveLogRequestDto") SaveLogRequestDto requestDto) {
 
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);

@@ -18,7 +18,7 @@ public class ImageInfo extends BaseTimeEntity {
     private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "log_id", nullable = false)
+    @JoinColumn(name = "log_id", nullable = false)
     private Log log;
 
     @Column(name = "image_name", nullable = false)

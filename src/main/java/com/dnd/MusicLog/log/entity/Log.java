@@ -9,12 +9,12 @@ import com.dnd.MusicLog.music.entity.custom.CustomMusic;
 import com.dnd.MusicLog.music.entity.spotify.SpotifyMusic;
 import com.dnd.MusicLog.music.enums.MusicType;
 import com.dnd.MusicLog.user.entity.User;
+import com.dnd.MusicLog.youtubeinfo.entity.YoutubeInfo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Getter
 @NoArgsConstructor
@@ -36,6 +36,10 @@ public class Log extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "custom_id")
     private CustomMusic customMusic;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "youtube_id")
+    private YoutubeInfo youtubeInfo;
 
     private String location;
 
@@ -93,6 +97,10 @@ public class Log extends BaseTimeEntity {
 
     public void setCustomMusic(CustomMusic customMusic){
         this.customMusic = customMusic;
+    }
+
+    public void setYoutubeInfo(YoutubeInfo youtubeInfo){
+        this.youtubeInfo = youtubeInfo;
     }
 
 }

@@ -27,17 +27,16 @@ public class LogController extends BaseController {
     private final JwtTokenProvider jwtTokenProvider;
     private final LogService logService;
 
-    //TODO : SaveLogRequestDto에 스포티파이 음악 저장하는데 필요한 프로퍼티 추가필요.
     @PostMapping("")
-    public ResponseEntity<SuccessResponse> saveLog(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<BaseResponse<Long>> saveLog(@RequestHeader(name = "Authorization") String bearerToken,
                                                               @RequestPart("images") List<MultipartFile> multipartFile,
                                                               @RequestPart("saveLogRequestDto") SaveLogRequestDto requestDto) {
 
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);
 
-        logService.saveLog(userId, requestDto, multipartFile);
-        return createSuccessResponse(HttpStatus.CREATED, "로그 저장 완료");
+        long logId = logService.saveLog(userId, requestDto, multipartFile);
+        return createBaseResponse(HttpStatus.CREATED, "로그 저장 완료", Long.valueOf(logId));
 
     }
 

@@ -43,7 +43,7 @@ public class LogService {
 
         // 유튜브 저장 부분
         if (requestDto.videoId() != null) {
-            YoutubeInfo youtubeInfo = youtubeInfoService.saveYoutubeInfo(requestDto);
+            YoutubeInfo youtubeInfo = youtubeInfoService.getOrCreateYoutubeInfo(requestDto);
             log.setYoutubeInfo(youtubeInfo);
         }
 

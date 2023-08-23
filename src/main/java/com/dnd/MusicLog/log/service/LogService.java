@@ -13,6 +13,8 @@ import com.dnd.MusicLog.log.repository.LogRepository;
 import com.dnd.MusicLog.music.enums.MusicType;
 import com.dnd.MusicLog.user.entity.User;
 import com.dnd.MusicLog.user.service.OAuthLoginService;
+import com.dnd.MusicLog.youtubeinfo.entity.YoutubeInfo;
+import com.dnd.MusicLog.youtubeinfo.service.YoutubeInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class LogService {
 
     private final OAuthLoginService oAuthLoginService;
     private final ImageInfoService imageInfoService;
+    private final YoutubeInfoService youtubeInfoService;
     private final LogRepository logRepository;
     private final ImageInfoRepository imageInfoRepository;
 
@@ -38,7 +41,13 @@ public class LogService {
             requestDto.feeling(), requestDto.time(), requestDto.weather(), requestDto.season(),
             requestDto.temp(), requestDto.date(), requestDto.musicType());
 
-        //로그 with 스포티파이
+        // 유튜브 저장 부분
+        if (requestDto.videoId() != null) {
+            YoutubeInfo youtubeInfo = youtubeInfoService.saveYoutubeInfo(requestDto);
+            log.setYoutubeInfo(youtubeInfo);
+        }
+
+        // 로그 with 스포티파이
         if (requestDto.musicType().equals(MusicType.SPOTIFY)) {
             //TODO : 스포티 파이 음악 정보 중복 검사 및 스포티파이 음악, 앨범, 아티스트 저장 로직 필요.
             //TODO : 로그 인스턴스에 스포티파이 음악 세팅 -> log.setSpotifyMusic(SpotifyMusic);
@@ -76,7 +85,12 @@ public class LogService {
             throw new BusinessLogicException(ErrorCode.NOT_FOUND);
         });
 
-        return new GetLogPlayResponseDto(log.getTitle(), log.getChannelTitle(), log.getDate(), log.getYoutubeId());
+        if (log.getYoutubeInfo() == null) {
+            return new GetLogPlayResponseDto(null, null, null, null);
+        } else {
+            return new GetLogPlayResponseDto(log.getYoutubeInfo().getTitle(), log.getYoutubeInfo().getChannelTitle(),
+                log.getYoutubeInfo().getPublishedAt(), log.getYoutubeInfo().getVideoId());
+        }
 
     }
 

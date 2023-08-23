@@ -25,7 +25,7 @@ public class LogController extends BaseController {
 
     //TODO : SaveLogRequestDto에 스포티파이 음악 저장하는데 필요한 프로퍼티 추가필요.
     @PostMapping("")
-    public ResponseEntity<SuccessResponse> saveLogWithSpotify(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<SuccessResponse> saveLog(@RequestHeader(name = "Authorization") String bearerToken,
                                                               @RequestPart("images") List<MultipartFile> multipartFile,
                                                               @RequestBody SaveLogRequestDto requestDto) {
 

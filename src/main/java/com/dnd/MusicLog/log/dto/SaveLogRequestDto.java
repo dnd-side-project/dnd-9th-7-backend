@@ -9,8 +9,7 @@ import jakarta.annotation.Nullable;
 
 import java.time.LocalDate;
 
-//TODO : 스포티파이 음악 저장 시 필요한 속성들 추가 필요.
-public record SaveLogRequestDto(@Nullable String location, @Nullable String record,
+public record SaveLogRequestDto(@Nullable String spotifyId, @Nullable String location, @Nullable String record,
                                 @Nullable String review, @Nullable String videoId, @Nullable String title,
                                 @Nullable String channelTitle, @Nullable String publishedAt, LocalDate date, boolean temp,
                                 Feeling feeling, Time time, Weather weather, Season season,

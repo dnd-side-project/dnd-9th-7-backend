@@ -1,20 +1,13 @@
 package com.dnd.MusicLog.log.service;
 
-import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
-import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
 import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
 import com.dnd.MusicLog.log.dto.SaveLogRequestDto;
 import com.dnd.MusicLog.log.entity.Log;
 import com.dnd.MusicLog.log.repository.LogRepository;
-import com.dnd.MusicLog.music.entity.custom.CustomMusic;
-import com.dnd.MusicLog.music.entity.spotify.SpotifyMusic;
 import com.dnd.MusicLog.music.enums.MusicType;
-import com.dnd.MusicLog.music.repository.custom.CustomMusicRepository;
-import com.dnd.MusicLog.music.repository.spotify.SpotifyMusicRepository;
 import com.dnd.MusicLog.taginfo.dto.Tag;
 import com.dnd.MusicLog.taginfo.entity.TagInfo;
-import com.dnd.MusicLog.taginfo.repository.TagInfoRepository;
 import com.dnd.MusicLog.taginfo.service.TagInfoService;
 import com.dnd.MusicLog.user.entity.User;
 import com.dnd.MusicLog.user.service.OAuthLoginService;
@@ -24,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service

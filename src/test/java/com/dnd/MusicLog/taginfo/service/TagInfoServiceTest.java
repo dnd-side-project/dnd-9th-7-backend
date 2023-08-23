@@ -1,7 +1,6 @@
 package com.dnd.MusicLog.taginfo.service;
 
 import com.dnd.MusicLog.taginfo.repository.TagInfoCustomRepositoryImpl;
-import com.dnd.MusicLog.taginfo.repository.TagInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

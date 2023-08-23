@@ -23,7 +23,6 @@ import java.util.List;
 public class LogService {
 
     private final OAuthLoginService oAuthLoginService;
-    private final TagInfoService tagInfoService;
     private final ImageInfoService imageInfoService;
     private final LogRepository logRepository;
 

@@ -6,6 +6,7 @@ import com.dnd.MusicLog.global.common.SuccessResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
 import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
+import com.dnd.MusicLog.log.dto.GetLogPlayResponseDto;
 import com.dnd.MusicLog.log.dto.GetLogRecordResponseDto;
 import com.dnd.MusicLog.log.dto.SaveLogRequestDto;
 import com.dnd.MusicLog.log.service.LogService;
@@ -49,6 +50,18 @@ public class LogController extends BaseController {
 
         GetLogRecordResponseDto responseDto = logService.getLogRecord(userId, logId);
         return createBaseResponse(HttpStatus.OK, "로그(RECORD 정보) 조회 완료",responseDto);
+
+    }
+
+    @GetMapping("/{logId}/play")
+    public ResponseEntity<BaseResponse<GetLogPlayResponseDto>> getLogPlay(@RequestHeader(name = "Authorization") String bearerToken,
+                                                                              @PathVariable(name = "logId") long logId) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        GetLogPlayResponseDto responseDto = logService.getLogPlay(userId, logId);
+        return createBaseResponse(HttpStatus.OK, "로그(PLAY 정보) 조회 완료",responseDto);
 
     }
 }

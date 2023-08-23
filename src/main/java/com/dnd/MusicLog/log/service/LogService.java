@@ -36,7 +36,6 @@ public class LogService {
         // 공통 프로퍼티 부분
         Log log = new Log(user, requestDto.location(), requestDto.record(), requestDto.review(),
             requestDto.feeling(), requestDto.time(), requestDto.weather(), requestDto.season(),
-            requestDto.youtubeId(), requestDto.title(), requestDto.channelTitle(), requestDto.publishedAt(),
             requestDto.temp(), requestDto.date(), requestDto.musicType());
 
         //로그 with 스포티파이

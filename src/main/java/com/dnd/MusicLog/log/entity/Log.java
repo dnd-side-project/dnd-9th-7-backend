@@ -59,14 +59,6 @@ public class Log extends BaseTimeEntity {
     @Column(nullable = false)
     private Season season;
 
-    private String youtubeId;
-
-    private String title;
-
-    private String channelTitle;
-
-    private String publishedAt;
-
     private boolean representation = false;
 
     @Column(name = "temp", nullable = false)
@@ -81,8 +73,7 @@ public class Log extends BaseTimeEntity {
     private MusicType musicType;
 
     public Log(User user, String location, String record, String review, Feeling feeling, Time time, Weather weather,
-               Season season, String youtubeId, String title, String channelTitle,
-               String publishedAt, boolean temp, LocalDate date, MusicType musicType) {
+               Season season, boolean temp, LocalDate date, MusicType musicType) {
         this.user = user;
         this.location = location;
         this.record = record;
@@ -91,10 +82,6 @@ public class Log extends BaseTimeEntity {
         this.time = time;
         this.weather = weather;
         this.season = season;
-        this.youtubeId = youtubeId;
-        this.title = title;
-        this.channelTitle = channelTitle;
-        this.publishedAt = publishedAt;
         this.temp = temp;
         this.date = date;
         this.musicType = musicType;

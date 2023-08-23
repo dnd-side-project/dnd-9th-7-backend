@@ -2,10 +2,12 @@ package com.dnd.MusicLog.music.controller;
 
 import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
+import com.dnd.MusicLog.music.dto.SpotifyItemResponse;
 import com.dnd.MusicLog.music.dto.SpotifyTrackResponseDto;
 import com.dnd.MusicLog.music.service.SpotifyMusicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,9 +25,18 @@ public class SpotifyMusicController extends BaseController {
     public SpotifyTrackResponseDto searchSpotifyMusic(
         @RequestHeader("Authorization") String token,
         @RequestParam("query") String query,
-        @RequestParam("offset") int offset) {
+        @RequestParam(value = "offset", defaultValue = "0") int offset) {
         jwtTokenProvider.extractAccessTokenSubject(token);
 
-        return spotifyMusicService.searchSpotifyMusic(query, offset);
+        return spotifyMusicService.searchSpotifyTrackList(query, offset);
+    }
+
+    @GetMapping("/{spotifyId}")
+    public SpotifyItemResponse getSpotifyMusic(
+        @RequestHeader("Authorization") String token,
+        @PathVariable(name = "spotifyId") String spotifyId) {
+        jwtTokenProvider.extractAccessTokenSubject(token);
+
+        return spotifyMusicService.searchSpotifyTrack(spotifyId);
     }
 }

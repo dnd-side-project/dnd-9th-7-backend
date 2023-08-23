@@ -1,23 +1,9 @@
 package com.dnd.MusicLog.taginfo.service;
 
-import com.dnd.MusicLog.log.entity.Log;
-import com.dnd.MusicLog.taginfo.dto.Tag;
-import com.dnd.MusicLog.taginfo.dto.TagResponseDto;
-import com.dnd.MusicLog.taginfo.entity.TagInfo;
-import com.dnd.MusicLog.taginfo.enums.Feeling;
-import com.dnd.MusicLog.taginfo.enums.Season;
-import com.dnd.MusicLog.taginfo.enums.Time;
-import com.dnd.MusicLog.taginfo.enums.Weather;
 import com.dnd.MusicLog.taginfo.repository.TagInfoCustomRepositoryImpl;
 import com.dnd.MusicLog.taginfo.repository.TagInfoRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -1,4 +1,4 @@
-package com.dnd.MusicLog.taginfo.enums;
+package com.dnd.MusicLog.log.enums;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

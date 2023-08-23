@@ -7,10 +7,6 @@ import com.dnd.MusicLog.log.repository.LogRepository;
 import com.dnd.MusicLog.taginfo.dto.Tag;
 import com.dnd.MusicLog.taginfo.dto.TagResponseDto;
 import com.dnd.MusicLog.taginfo.entity.TagInfo;
-import com.dnd.MusicLog.taginfo.enums.Feeling;
-import com.dnd.MusicLog.taginfo.enums.Season;
-import com.dnd.MusicLog.taginfo.enums.Time;
-import com.dnd.MusicLog.taginfo.enums.Weather;
 import com.dnd.MusicLog.taginfo.repository.TagInfoCustomRepositoryImpl;
 import com.dnd.MusicLog.taginfo.repository.TagInfoRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static com.dnd.MusicLog.taginfo.entity.QTagInfo.tagInfo;
 
 @RequiredArgsConstructor
 @Service

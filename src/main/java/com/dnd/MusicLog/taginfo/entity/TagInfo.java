@@ -2,10 +2,10 @@ package com.dnd.MusicLog.taginfo.entity;
 
 import com.dnd.MusicLog.global.common.BaseTimeEntity;
 import com.dnd.MusicLog.log.entity.Log;
-import com.dnd.MusicLog.taginfo.enums.Feeling;
-import com.dnd.MusicLog.taginfo.enums.Season;
-import com.dnd.MusicLog.taginfo.enums.Time;
-import com.dnd.MusicLog.taginfo.enums.Weather;
+import com.dnd.MusicLog.log.enums.Feeling;
+import com.dnd.MusicLog.log.enums.Season;
+import com.dnd.MusicLog.log.enums.Time;
+import com.dnd.MusicLog.log.enums.Weather;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

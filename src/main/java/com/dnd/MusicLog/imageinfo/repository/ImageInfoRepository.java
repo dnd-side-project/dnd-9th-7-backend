@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface ImageInfoRepository extends JpaRepository<ImageInfo, Long> {
 
-    List<ImageInfo> findAllByLogId(long logId);
+    List<ImageInfo> findAllByLogIdOrderByCreatedDateAsc(long logId);
 
     Optional<ImageInfo> findByImageName(String imageName);
 

@@ -112,7 +112,7 @@ public class ImageInfoService {
 
     // TODO : 로그 테이블 생성 후 조인을 이용할 예정
     public FileNamesResponseDto searchImages(long logId) {
-        List<ImageInfo> imageInfoList = imageInfoRepository.findAllByLogId(logId);
+        List<ImageInfo> imageInfoList = imageInfoRepository.findAllByLogIdOrderByCreatedDateAsc(logId);
 
         if (imageInfoList.isEmpty()) {
             throw new BusinessLogicException(ErrorCode.NOT_FOUND);

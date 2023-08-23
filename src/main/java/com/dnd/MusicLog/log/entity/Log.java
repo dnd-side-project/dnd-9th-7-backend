@@ -1,6 +1,10 @@
 package com.dnd.MusicLog.log.entity;
 
 import com.dnd.MusicLog.global.common.BaseTimeEntity;
+import com.dnd.MusicLog.log.enums.Feeling;
+import com.dnd.MusicLog.log.enums.Season;
+import com.dnd.MusicLog.log.enums.Time;
+import com.dnd.MusicLog.log.enums.Weather;
 import com.dnd.MusicLog.music.entity.custom.CustomMusic;
 import com.dnd.MusicLog.music.entity.spotify.SpotifyMusic;
 import com.dnd.MusicLog.music.enums.MusicType;
@@ -39,6 +43,22 @@ public class Log extends BaseTimeEntity {
 
     private String review;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Feeling feeling;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Time time;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Weather weather;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Season season;
+
     private String youtubeId;
 
     private String title;
@@ -58,12 +78,17 @@ public class Log extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MusicType musicType;
 
-    public Log(User user, String location, String record, String review, String youtubeId, String title, String channelTitle,
+    public Log(User user, String location, String record, String review, Feeling feeling, Time time, Weather weather,
+               Season season, String youtubeId, String title, String channelTitle,
                String publishedAt, boolean temp, LocalDate date, MusicType musicType) {
         this.user = user;
         this.location = location;
         this.record = record;
         this.review = review;
+        this.feeling = feeling;
+        this.time = time;
+        this.weather = weather;
+        this.season = season;
         this.youtubeId = youtubeId;
         this.title = title;
         this.channelTitle = channelTitle;

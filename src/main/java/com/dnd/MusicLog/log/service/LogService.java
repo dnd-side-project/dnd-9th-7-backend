@@ -56,6 +56,7 @@ public class LogService {
     }
 
     // 기록 보기 2페이지 - RECORD
+    @Transactional(readOnly = true)
     public GetLogRecordResponseDto getLogRecord(long userId, long logId) {
 
         Log log = logRepository.findByIdAndUserId(userId, logId).orElseThrow(() -> {

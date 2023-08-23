@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -110,23 +111,13 @@ public class ImageInfoService {
         amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }
 
-    // TODO : 로그 테이블 생성 후 조인을 이용할 예정
-    public FileNamesResponseDto searchImages(long logId) {
-        List<ImageInfo> imageInfoList = imageInfoRepository.findAllByLogIdOrderByCreatedDateAsc(logId);
-
-        if (imageInfoList.isEmpty()) {
+    public String searchImage(long logId) {
+        ImageInfo imageInfo = imageInfoRepository.findByLogId(logId).orElseThrow(() -> {
             throw new BusinessLogicException(ErrorCode.NOT_FOUND);
-        }
-
-        List<String> fileNameList = new ArrayList<>();
-
-        imageInfoList.forEach(imageInfo -> {
-            fileNameList.add(imageInfo.getImageName());
         });
 
-        return FileNamesResponseDto.builder()
-            .fileNames(fileNameList)
-            .build();
+        return imageInfo.getImageName();
+
     }
 
     private String createFileName(String fileName, String dirName) {

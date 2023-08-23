@@ -67,6 +67,8 @@ public class Log extends BaseTimeEntity {
 
     private String publishedAt;
 
+    private boolean representation = false;
+
     @Column(name = "temp", nullable = false)
     private boolean temp;
 

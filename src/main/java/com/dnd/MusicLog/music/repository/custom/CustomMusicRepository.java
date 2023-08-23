@@ -15,12 +15,10 @@ public interface CustomMusicRepository extends JpaRepository<CustomMusic, Long> 
         SELECT cm
         FROM CustomMusic cm
         WHERE cm.name LIKE CONCAT("%", :query,"%")
-        AND cm.author.id = :userId
         """)
     List<CustomMusic> searchAllByUserIdAndQuery(
-        @Param("userId") long userId,
         @Param("query") String query,
         PageRequest pageRequest);
 
-    Optional<CustomMusic> findByIdAndAuthor(long id, User author);
+    Optional<CustomMusic> findById(long id);
 }

@@ -37,10 +37,9 @@ public class CustomMusicController extends BaseController {
         @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
         @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
         String subject = jwtTokenProvider.extractAccessTokenSubject(token);
-        long userId = Long.parseLong(subject);
 
         SearchCustomMusicResponseDto response =
-            customMusicService.searchCustomMusic(userId, query, offset, size);
+            customMusicService.searchCustomMusic(query, offset, size);
 
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 검색 성공", response);
     }
@@ -52,7 +51,7 @@ public class CustomMusicController extends BaseController {
         String subject = jwtTokenProvider.extractAccessTokenSubject(token);
         long userId = Long.parseLong(subject);
 
-        CustomMusicItem response = customMusicService.searchCustomMusic(userId, customMusicId);
+        CustomMusicItem response = customMusicService.searchCustomMusic(customMusicId);
 
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 검색 성공", response);
     }
@@ -64,7 +63,7 @@ public class CustomMusicController extends BaseController {
         String subject = jwtTokenProvider.extractAccessTokenSubject(token);
         long userId = Long.parseLong(subject);
 
-        CustomMusicResponseDto responseDto = customMusicService.saveCustomMusic(userId, customMusicRequestDto);
+        CustomMusicResponseDto responseDto = customMusicService.saveCustomMusic(customMusicRequestDto);
 
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 저장 완료", responseDto);
     }
@@ -78,7 +77,7 @@ public class CustomMusicController extends BaseController {
         long userId = Long.parseLong(subject);
 
         CustomMusicResponseDto response =
-            customMusicService.updateCustomMusic(userId, customMusicId, customMusicRequestDto);
+            customMusicService.updateCustomMusic(customMusicId, customMusicRequestDto);
 
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 수정 완료", response);
     }
@@ -90,7 +89,7 @@ public class CustomMusicController extends BaseController {
         String subject = jwtTokenProvider.extractAccessTokenSubject(token);
         long userId = Long.parseLong(subject);
 
-        CustomMusicResponseDto response = customMusicService.deleteCustomMusic(userId, customMusicId);
+        CustomMusicResponseDto response = customMusicService.deleteCustomMusic(customMusicId);
 
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 삭제 완료", response);
     }

@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface LogRepository extends JpaRepository<Log, Long> {
 
     Optional<Log> findById(long id);
+
+    Optional<Log> findByIdAndUserId(long id, long userId);
 }

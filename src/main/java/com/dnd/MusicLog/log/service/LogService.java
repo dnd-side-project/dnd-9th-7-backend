@@ -1,7 +1,11 @@
 package com.dnd.MusicLog.log.service;
 
+import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
+import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
+import com.dnd.MusicLog.imageinfo.repository.ImageInfoRepository;
 import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
+import com.dnd.MusicLog.log.dto.GetLogRecordResponseDto;
 import com.dnd.MusicLog.log.dto.SaveLogRequestDto;
 import com.dnd.MusicLog.log.entity.Log;
 import com.dnd.MusicLog.log.repository.LogRepository;
@@ -22,6 +26,7 @@ public class LogService {
     private final OAuthLoginService oAuthLoginService;
     private final ImageInfoService imageInfoService;
     private final LogRepository logRepository;
+    private final ImageInfoRepository imageInfoRepository;
 
     @Transactional
     public void saveLog(long userId, SaveLogRequestDto requestDto, List<MultipartFile> multipartFile) {
@@ -48,5 +53,17 @@ public class LogService {
 
         FileNamesResponseDto responseDto = imageInfoService.uploadImages(logId, multipartFile);
 
+    }
+
+    // 기록 보기 2페이지 - RECORD
+    public GetLogRecordResponseDto getLogRecord(long userId, long logId) {
+
+        Log log = logRepository.findByIdAndUserId(userId, logId).orElseThrow(() -> {
+            throw new BusinessLogicException(ErrorCode.NOT_FOUND);
+        });
+
+        List<String> fileNameList = imageInfoRepository.findAllByLogIdOrderByCreatedDateAsc(logId);
+
+        return new GetLogRecordResponseDto(log.getRecord(), new FileNamesResponseDto(fileNameList));
     }
 }

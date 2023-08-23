@@ -1,12 +1,11 @@
 package com.dnd.MusicLog.taginfo.repository;
 
 import com.dnd.MusicLog.taginfo.dto.Tag;
-import com.dnd.MusicLog.taginfo.entity.QTagInfo;
 import com.dnd.MusicLog.taginfo.entity.TagInfo;
-import com.dnd.MusicLog.taginfo.enums.Feeling;
-import com.dnd.MusicLog.taginfo.enums.Season;
-import com.dnd.MusicLog.taginfo.enums.Time;
-import com.dnd.MusicLog.taginfo.enums.Weather;
+import com.dnd.MusicLog.log.enums.Feeling;
+import com.dnd.MusicLog.log.enums.Season;
+import com.dnd.MusicLog.log.enums.Time;
+import com.dnd.MusicLog.log.enums.Weather;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

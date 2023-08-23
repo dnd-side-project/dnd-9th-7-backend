@@ -1,12 +1,15 @@
 package com.dnd.MusicLog.log.controller;
 
 import com.dnd.MusicLog.global.common.BaseController;
+import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.common.SuccessResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
 import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
+import com.dnd.MusicLog.log.dto.GetLogRecordResponseDto;
 import com.dnd.MusicLog.log.dto.SaveLogRequestDto;
 import com.dnd.MusicLog.log.service.LogService;
+import com.dnd.MusicLog.music.dto.CustomMusicItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +37,18 @@ public class LogController extends BaseController {
 
         logService.saveLog(userId, requestDto, multipartFile);
         return createSuccessResponse(HttpStatus.CREATED, "로그 저장 완료");
+
+    }
+
+    @GetMapping("/{logId}/record")
+    public ResponseEntity<BaseResponse<GetLogRecordResponseDto>> getLogRecord(@RequestHeader(name = "Authorization") String bearerToken,
+                                                                 @PathVariable(name = "logId") long logId) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        GetLogRecordResponseDto responseDto = logService.getLogRecord(userId, logId);
+        return createBaseResponse(HttpStatus.OK, "로그(RECORD 정보) 조회 완료",responseDto);
 
     }
 }

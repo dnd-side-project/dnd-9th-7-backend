@@ -41,7 +41,8 @@ public class LogService {
 
         // 공통 프로퍼티 부분
         Log log = new Log(user, requestDto.location(), requestDto.record(), requestDto.review(),
-            requestDto.youtubeId(), requestDto.temp(), requestDto.date(), requestDto.musicType());
+            requestDto.youtubeId(), requestDto.title(), requestDto.channelTitle(), requestDto.publishedAt(),
+            requestDto.temp(), requestDto.date(), requestDto.musicType());
 
         //로그 with 스포티파이
         if (requestDto.musicType().equals(MusicType.SPOTIFY)) {

@@ -41,6 +41,12 @@ public class Log extends BaseTimeEntity {
 
     private String youtubeId;
 
+    private String title;
+
+    private String channelTitle;
+
+    private String publishedAt;
+
     @Column(name = "temp", nullable = false)
     private boolean temp;
 
@@ -52,12 +58,16 @@ public class Log extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MusicType musicType;
 
-    public Log(User user, String location, String record, String review, String youtubeId, boolean temp, LocalDate date, MusicType musicType) {
+    public Log(User user, String location, String record, String review, String youtubeId, String title, String channelTitle,
+               String publishedAt, boolean temp, LocalDate date, MusicType musicType) {
         this.user = user;
         this.location = location;
         this.record = record;
         this.review = review;
         this.youtubeId = youtubeId;
+        this.title = title;
+        this.channelTitle = channelTitle;
+        this.publishedAt = publishedAt;
         this.temp = temp;
         this.date = date;
         this.musicType = musicType;

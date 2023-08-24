@@ -2,12 +2,12 @@ package com.dnd.MusicLog.log.service;
 
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
 import com.dnd.MusicLog.global.error.exception.ErrorCode;
-import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
 import com.dnd.MusicLog.imageinfo.repository.ImageInfoRepository;
 import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
 import com.dnd.MusicLog.log.dto.GetLogPlayResponseDto;
 import com.dnd.MusicLog.log.dto.GetLogRecordResponseDto;
 import com.dnd.MusicLog.log.dto.SaveLogRequestDto;
+import com.dnd.MusicLog.log.dto.SaveLogResponseDto;
 import com.dnd.MusicLog.log.entity.Log;
 import com.dnd.MusicLog.log.repository.LogRepository;
 import com.dnd.MusicLog.music.dto.CustomMusicRequestDto;
@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -47,7 +46,7 @@ public class LogService {
     private final CustomMusicRepository customMusicRepository;
 
     @Transactional
-    public long saveLog(long userId, SaveLogRequestDto requestDto, List<MultipartFile> multipartFile) {
+    public SaveLogResponseDto saveLog(long userId, SaveLogRequestDto requestDto, List<MultipartFile> multipartFile) {
         User user = oAuthLoginService.getUser(userId);
 
         // 공통 프로퍼티 부분
@@ -86,9 +85,9 @@ public class LogService {
 
         long logId = logRepository.save(log).getId();
 
-        FileNamesResponseDto responseDto = imageInfoService.uploadImages(logId, multipartFile);
+        imageInfoService.uploadImages(logId, multipartFile);
 
-        return logId;
+        return new SaveLogResponseDto(logId);
     }
 
     // 기록 보기 2페이지 - RECORD

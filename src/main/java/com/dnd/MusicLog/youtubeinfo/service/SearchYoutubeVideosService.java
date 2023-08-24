@@ -1,4 +1,4 @@
-package com.dnd.MusicLog.log.service;
+package com.dnd.MusicLog.youtubeinfo.service;
 
 import com.dnd.MusicLog.log.dto.YoutubeVideoListResponseDto;
 import lombok.RequiredArgsConstructor;

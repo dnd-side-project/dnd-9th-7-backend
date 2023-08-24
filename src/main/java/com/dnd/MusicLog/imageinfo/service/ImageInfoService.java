@@ -1,10 +1,7 @@
 package com.dnd.MusicLog.imageinfo.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
 import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
@@ -22,8 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -110,6 +107,28 @@ public class ImageInfoService {
         imageInfoRepository.deleteByImageName(imageInfo.getImageName());
         amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }
+
+    @Transactional
+    public void deleteImages(long logId) {
+
+        List<String> fileNames = imageInfoRepository.findAllByLogIdOrderByCreatedDateAsc(logId);
+
+        for (String fileName : fileNames) {
+            ImageInfo imageInfo = imageInfoRepository.findByImageName(fileName)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
+
+            imageInfoRepository.delete(imageInfo);
+        }
+
+        List<DeleteObjectsRequest.KeyVersion> keys = fileNames.stream()
+            .map(s3Key -> new DeleteObjectsRequest.KeyVersion(s3Key))
+            .collect(Collectors.toList());
+
+        if (!keys.isEmpty()) {
+            amazonS3.deleteObjects(new DeleteObjectsRequest(bucket).withKeys(keys));
+        }
+    }
+
 
     public String searchImage(long logId) {
         ImageInfo imageInfo = imageInfoRepository.findByLogId(logId).orElseThrow(() -> {

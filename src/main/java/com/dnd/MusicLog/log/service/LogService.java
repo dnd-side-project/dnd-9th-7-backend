@@ -94,7 +94,7 @@ public class LogService {
     @Transactional(readOnly = true)
     public GetLogRecordResponseDto getLogRecord(long userId, long logId) {
 
-        Log log = logRepository.findByIdAndUserId(userId, logId).orElseThrow(() -> {
+        Log log = logRepository.findByIdAndUserId(logId, userId).orElseThrow(() -> {
             throw new BusinessLogicException(ErrorCode.NOT_FOUND);
         });
 
@@ -107,7 +107,7 @@ public class LogService {
     @Transactional(readOnly = true)
     public GetLogPlayResponseDto getLogPlay(long userId, long logId) {
 
-        Log log = logRepository.findByIdAndUserId(userId, logId).orElseThrow(() -> {
+        Log log = logRepository.findByIdAndUserId(logId, userId).orElseThrow(() -> {
             throw new BusinessLogicException(ErrorCode.NOT_FOUND);
         });
 
@@ -119,5 +119,22 @@ public class LogService {
         }
 
     }
+
+    // 삭제 서비스 (로그 and 이미지)
+    @Transactional
+    public void deleteLog(long userId, long logId) {
+
+        Log log = logRepository.findByIdAndUserId(logId, userId).orElseThrow(() -> {
+            throw new BusinessLogicException(ErrorCode.NOT_FOUND);
+        });
+
+        // 이미지 정보 삭제
+        imageInfoService.deleteImages(log.getId());
+
+        // 로그 삭제
+        logRepository.delete(log);
+
+    }
+
 
 }

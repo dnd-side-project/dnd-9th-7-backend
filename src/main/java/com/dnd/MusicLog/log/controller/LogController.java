@@ -2,6 +2,7 @@ package com.dnd.MusicLog.log.controller;
 
 import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
+import com.dnd.MusicLog.global.common.SuccessResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.log.dto.GetLogPlayResponseDto;
 import com.dnd.MusicLog.log.dto.GetLogRecordResponseDto;
@@ -58,6 +59,18 @@ public class LogController extends BaseController {
 
         GetLogPlayResponseDto responseDto = logService.getLogPlay(userId, logId);
         return createBaseResponse(HttpStatus.OK, "로그(PLAY 정보) 조회 완료",responseDto);
+
+    }
+
+    @DeleteMapping("/{logId}")
+    public ResponseEntity<SuccessResponse> deleteLog(@RequestHeader(name = "Authorization") String bearerToken,
+                                                                         @PathVariable(name = "logId") long logId) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        logService.deleteLog(userId, logId);
+        return createSuccessResponse(HttpStatus.OK, "로그 삭제 완료");
 
     }
 }

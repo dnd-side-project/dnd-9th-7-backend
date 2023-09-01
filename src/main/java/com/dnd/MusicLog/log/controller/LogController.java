@@ -4,10 +4,7 @@ import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.common.SuccessResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
-import com.dnd.MusicLog.log.dto.GetLogPlayResponseDto;
-import com.dnd.MusicLog.log.dto.GetLogRecordResponseDto;
-import com.dnd.MusicLog.log.dto.SaveLogRequestDto;
-import com.dnd.MusicLog.log.dto.SaveLogResponseDto;
+import com.dnd.MusicLog.log.dto.*;
 import com.dnd.MusicLog.log.service.LogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -61,6 +58,18 @@ public class LogController extends BaseController {
 
         logService.deleteLog(userId, logId);
         return createSuccessResponse(HttpStatus.OK, "로그 삭제 완료");
+
+    }
+
+    @GetMapping("/{logId}/music")
+    public ResponseEntity<BaseResponse<GetLogMusicResponseDto>> getLogMusic(@RequestHeader(name = "Authorization") String bearerToken,
+                                                                              @PathVariable(name = "logId") long logId) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        GetLogMusicResponseDto responseDto = logService.getLogMusic(userId, logId);
+        return createBaseResponse(HttpStatus.OK, "로그(MUSIC 정보) 조회 완료",responseDto);
 
     }
 

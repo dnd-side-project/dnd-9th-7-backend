@@ -9,6 +9,7 @@ import com.dnd.MusicLog.log.entity.Log;
 import com.dnd.MusicLog.log.repository.LogRepository;
 import com.dnd.MusicLog.music.dto.CustomMusicRequestDto;
 import com.dnd.MusicLog.music.dto.CustomMusicResponseDto;
+import com.dnd.MusicLog.music.dto.SpotifyArtistResponse;
 import com.dnd.MusicLog.music.dto.SpotifyItemResponse;
 import com.dnd.MusicLog.music.entity.custom.CustomMusic;
 import com.dnd.MusicLog.music.entity.spotify.SpotifyMusic;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -157,14 +159,39 @@ public class LogService {
 
     // 기록 보기 1페이지 - MUSIC
     @Transactional(readOnly = true)
-    public void getLogMusic(long userId, long logId) {
+    public GetLogMusicResponseDto getLogMusic(long userId, long logId) {
 
-        //음악 -> 앨범커버이미지, 아티스트, 제목
-        //로그 -> 한줄평, 카테고리, 위치, 날짜
         Log log = logRepository.findByIdAndUserId(logId, userId).orElseThrow(() -> {
             throw new BusinessLogicException(ErrorCode.NOT_FOUND);
         });
 
+        List<String> artistList = new ArrayList<>();
+
+        if (log.getMusicType() == MusicType.SPOTIFY) {
+
+            SpotifyItemResponse spotifyItemResponse = spotifyMusicService.searchSpotifyTrack(log.getSpotifyMusic().getSpotifyId());
+
+            List<SpotifyArtistResponse> artists = spotifyItemResponse.artists();
+            for (SpotifyArtistResponse artist: artists) {
+                artistList.add(artist.name());
+            }
+
+            return new GetLogMusicResponseDto(log.getSpotifyMusic().getAlbum().getImageUrl(), artistList,
+                log.getSpotifyMusic().getName(), log.getReview(), log.getFeeling().name(), log.getTime().name(), log.getWeather().name(),
+                log.getLocation(), log.getDate()
+            );
+        }
+
+        if (log.getMusicType() == MusicType.CUSTOM) {
+
+            artistList.add(log.getCustomMusic().getArtist());
+            return new GetLogMusicResponseDto(log.getCustomMusic().getImageUrl(), artistList,
+                log.getCustomMusic().getName(), log.getReview(), log.getFeeling().name(), log.getTime().name(), log.getWeather().name(),
+                log.getLocation(), log.getDate()
+            );
+        }
+
+        throw new BusinessLogicException(ErrorCode.SERVER_ERROR);
 
     }
 

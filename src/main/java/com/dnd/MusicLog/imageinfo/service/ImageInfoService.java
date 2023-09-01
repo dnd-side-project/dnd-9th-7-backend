@@ -84,11 +84,13 @@ public class ImageInfoService {
 
             fileNameList.add(fileName);
 
+            String imageUrl = "https://s3." + region + ".amazonaws.com/" + bucket + "/" + fileName;
+
             // ImageInfo 객체 생성 후 리스트에 추가
             ImageInfo imageInfo = ImageInfo.builder()
                 .log(log)
                 .imageName(fileName)
-                .imageUrl("https://s3." + region + ".amazonaws.com/" + bucket + "/" + fileName)
+                .imageUrl(imageUrl)
                 .build();
 
             imageInfoList.add(imageInfo);

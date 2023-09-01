@@ -91,6 +91,20 @@ public class Log extends BaseTimeEntity {
         this.musicType = musicType;
     }
 
+    public void updateLogInfo(String location, String record, String review, Feeling feeling, Time time, Weather weather, Season season,
+               boolean temp, LocalDate date, MusicType musicType) {
+        this.location = location;
+        this.record = record;
+        this.review = review;
+        this.feeling = feeling;
+        this.time = time;
+        this.weather = weather;
+        this.season = season;
+        this.temp = temp;
+        this.date = date;
+        this.musicType = musicType;
+    }
+
     public void setSpotifyMusic(SpotifyMusic spotifyMusic){
         this.spotifyMusic = spotifyMusic;
     }

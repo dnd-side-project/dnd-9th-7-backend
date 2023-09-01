@@ -31,6 +31,9 @@ public class ImageInfoService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Value("${cloud.aws.region.static}")
+    private String region;
+
     private final AmazonS3 amazonS3;
     private final LogRepository logRepository;
     private final ImageInfoRepository imageInfoRepository;
@@ -85,6 +88,7 @@ public class ImageInfoService {
             ImageInfo imageInfo = ImageInfo.builder()
                 .log(log)
                 .imageName(fileName)
+                .imageUrl("https://s3." + region + ".amazonaws.com/" + bucket + "/" + fileName)
                 .build();
 
             imageInfoList.add(imageInfo);

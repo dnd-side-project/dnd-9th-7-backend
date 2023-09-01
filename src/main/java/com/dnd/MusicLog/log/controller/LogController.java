@@ -38,6 +38,32 @@ public class LogController extends BaseController {
 
     }
 
+    @PostMapping("/{logId}")
+    public ResponseEntity<SuccessResponse> updateLog(@RequestHeader(name = "Authorization") String bearerToken,
+                                                     @RequestPart("images") List<MultipartFile> multipartFile,
+                                                     @RequestPart("saveLogRequestDto") SaveLogRequestDto requestDto,
+                                                     @PathVariable(name = "logId") long logId) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        logService.updateLog(userId, logId, requestDto, multipartFile);
+        return createSuccessResponse(HttpStatus.OK, "로그 수정 완료");
+
+    }
+
+    @DeleteMapping("/{logId}")
+    public ResponseEntity<SuccessResponse> deleteLog(@RequestHeader(name = "Authorization") String bearerToken,
+                                                     @PathVariable(name = "logId") long logId) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        logService.deleteLog(userId, logId);
+        return createSuccessResponse(HttpStatus.OK, "로그 삭제 완료");
+
+    }
+
     @GetMapping("/{logId}/record")
     public ResponseEntity<BaseResponse<GetLogRecordResponseDto>> getLogRecord(@RequestHeader(name = "Authorization") String bearerToken,
                                                                  @PathVariable(name = "logId") long logId) {
@@ -62,15 +88,4 @@ public class LogController extends BaseController {
 
     }
 
-    @DeleteMapping("/{logId}")
-    public ResponseEntity<SuccessResponse> deleteLog(@RequestHeader(name = "Authorization") String bearerToken,
-                                                                         @PathVariable(name = "logId") long logId) {
-
-        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        long userId = Long.parseLong(subject);
-
-        logService.deleteLog(userId, logId);
-        return createSuccessResponse(HttpStatus.OK, "로그 삭제 완료");
-
-    }
 }

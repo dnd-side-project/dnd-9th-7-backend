@@ -35,7 +35,7 @@ public class LogController extends BaseController {
 
     }
 
-    @PostMapping("/{logId}")
+    @PutMapping("/{logId}")
     public ResponseEntity<SuccessResponse> updateLog(@RequestHeader(name = "Authorization") String bearerToken,
                                                      @RequestPart("images") List<MultipartFile> multipartFile,
                                                      @RequestPart("saveLogRequestDto") SaveLogRequestDto requestDto,

@@ -126,7 +126,6 @@ public class LogService {
             CustomMusicRequestDto customMusicRequestDto = new CustomMusicRequestDto(requestDto.name(),
                 requestDto.imageUrl(), requestDto.artist());
 
-            // TODO : 로그 수정 할때도 커스텀 음악은 삭제안해도 되는지...?
             CustomMusicResponseDto customMusicResponseDto = customMusicService.saveCustomMusic(customMusicRequestDto);
             CustomMusic customMusic = customMusicRepository.findById(customMusicResponseDto.getId()).orElseThrow(() -> {
                 throw new BusinessLogicException(ErrorCode.NOT_FOUND);

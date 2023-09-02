@@ -13,7 +13,10 @@ import java.util.Optional;
 public interface ImageInfoRepository extends JpaRepository<ImageInfo, Long> {
 
     @Query("SELECT i.imageUrl FROM ImageInfo i WHERE i.log.id = :logId ORDER BY i.createdDate ASC")
-    List<String> findAllByLogIdOrderByCreatedDateAsc(@Param("logId") long logId);
+    List<String> findAllImageUrlByLogIdOrderByCreatedDateAsc(@Param("logId") long logId);
+
+    @Query("SELECT i.imageName FROM ImageInfo i WHERE i.log.id = :logId ORDER BY i.createdDate ASC")
+    List<String> findAllImageNameByLogIdOrderByCreatedDateAsc(@Param("logId") long logId);
 
     Optional<ImageInfo> findByLogId(long logId);
 

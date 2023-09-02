@@ -203,7 +203,7 @@ public class LogService {
             throw new BusinessLogicException(ErrorCode.NOT_FOUND);
         });
 
-        List<String> fileUrlList = imageInfoRepository.findAllByLogIdOrderByCreatedDateAsc(logId);
+        List<String> fileUrlList = imageInfoRepository.findAllImageUrlByLogIdOrderByCreatedDateAsc(logId);
 
         return new GetLogRecordResponseDto(log.getRecord(), fileUrlList);
     }
@@ -264,7 +264,7 @@ public class LogService {
         }
 
         // 기록 보기 2페이지 정보 - RECORD
-        List<String> fileUrlList = imageInfoRepository.findAllByLogIdOrderByCreatedDateAsc(logId);
+        List<String> fileUrlList = imageInfoRepository.findAllImageUrlByLogIdOrderByCreatedDateAsc(logId);
 
         logRecordResponseDto = new GetLogRecordResponseDto(log.getRecord(), fileUrlList);
 

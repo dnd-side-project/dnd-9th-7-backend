@@ -117,7 +117,7 @@ public class ImageInfoService {
     @Transactional
     public void deleteImages(long logId) {
 
-        List<String> fileNames = imageInfoRepository.findAllByLogIdOrderByCreatedDateAsc(logId);
+        List<String> fileNames = imageInfoRepository.findAllImageNameByLogIdOrderByCreatedDateAsc(logId);
 
         for (String fileName : fileNames) {
             ImageInfo imageInfo = imageInfoRepository.findByImageName(fileName)

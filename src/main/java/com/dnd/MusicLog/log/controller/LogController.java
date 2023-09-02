@@ -69,7 +69,7 @@ public class LogController extends BaseController {
         long userId = Long.parseLong(subject);
 
         GetLogMusicResponseDto responseDto = logService.getLogMusic(userId, logId);
-        return createBaseResponse(HttpStatus.OK, "로그(MUSIC 정보) 조회 완료",responseDto);
+        return createBaseResponse(HttpStatus.OK, "로그(MUSIC 정보) 조회 완료", responseDto);
 
     }
 
@@ -81,7 +81,7 @@ public class LogController extends BaseController {
         long userId = Long.parseLong(subject);
 
         GetLogRecordResponseDto responseDto = logService.getLogRecord(userId, logId);
-        return createBaseResponse(HttpStatus.OK, "로그(RECORD 정보) 조회 완료",responseDto);
+        return createBaseResponse(HttpStatus.OK, "로그(RECORD 정보) 조회 완료", responseDto);
 
     }
 
@@ -93,7 +93,19 @@ public class LogController extends BaseController {
         long userId = Long.parseLong(subject);
 
         GetLogPlayResponseDto responseDto = logService.getLogPlay(userId, logId);
-        return createBaseResponse(HttpStatus.OK, "로그(PLAY 정보) 조회 완료",responseDto);
+        return createBaseResponse(HttpStatus.OK, "로그(PLAY 정보) 조회 완료", responseDto);
+
+    }
+
+    @GetMapping("/{logId}")
+    public ResponseEntity<BaseResponse<GetFullLogResponseDto>> getFullLog(@RequestHeader(name = "Authorization") String bearerToken,
+                                                                            @PathVariable(name = "logId") long logId) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        GetFullLogResponseDto responseDto = logService.getFullLog(userId, logId);
+        return createBaseResponse(HttpStatus.OK, "로그 전체 정보 조회 완료", responseDto);
 
     }
 

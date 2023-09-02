@@ -225,4 +225,59 @@ public class LogService {
 
     }
 
+    // 로그 기록 전체 조회 = 수정 페이지
+    @Transactional(readOnly = true)
+    public GetFullLogResponseDto getFullLog(long userId, long logId) {
+
+        Log log = logRepository.findByIdAndUserId(logId, userId).orElseThrow(() -> {
+            throw new BusinessLogicException(ErrorCode.NOT_FOUND);
+        });
+
+        // 기록 보기 1페이지 정보 - MUSIC
+        List<String> artistList = new ArrayList<>();
+        GetLogMusicResponseDto logMusicResponseDto = null;
+        GetLogRecordResponseDto logRecordResponseDto;
+        GetLogPlayResponseDto logPlayResponseDto;
+
+        if (log.getMusicType() == MusicType.SPOTIFY) {
+
+            SpotifyItemResponse spotifyItemResponse = spotifyMusicService.searchSpotifyTrack(log.getSpotifyMusic().getSpotifyId());
+
+            List<SpotifyArtistResponse> artists = spotifyItemResponse.artists();
+            for (SpotifyArtistResponse artist: artists) {
+                artistList.add(artist.name());
+            }
+
+            logMusicResponseDto = new GetLogMusicResponseDto(log.getSpotifyMusic().getAlbum().getImageUrl(), artistList,
+                log.getSpotifyMusic().getName(), log.getReview(), log.getFeeling().name(), log.getTime().name(), log.getWeather().name(),
+                log.getLocation(), log.getDate()
+            );
+        }
+
+        if (log.getMusicType() == MusicType.CUSTOM) {
+
+            artistList.add(log.getCustomMusic().getArtist());
+            logMusicResponseDto = new GetLogMusicResponseDto(log.getCustomMusic().getImageUrl(), artistList,
+                log.getCustomMusic().getName(), log.getReview(), log.getFeeling().name(), log.getTime().name(), log.getWeather().name(),
+                log.getLocation(), log.getDate()
+            );
+        }
+
+        // 기록 보기 2페이지 정보 - RECORD
+        List<String> fileUrlList = imageInfoRepository.findAllByLogIdOrderByCreatedDateAsc(logId);
+
+        logRecordResponseDto = new GetLogRecordResponseDto(log.getRecord(), fileUrlList);
+
+        // 기록 보기 3페이지 정보 - PLAY
+        if (log.getYoutubeInfo() == null) {
+            logPlayResponseDto = new GetLogPlayResponseDto(null, null, null, null);
+        } else {
+            logPlayResponseDto = new GetLogPlayResponseDto(log.getYoutubeInfo().getTitle(), log.getYoutubeInfo().getChannelTitle(),
+                log.getYoutubeInfo().getPublishedAt(), log.getYoutubeInfo().getVideoId());
+        }
+
+        return new GetFullLogResponseDto(logMusicResponseDto, logRecordResponseDto, logPlayResponseDto);
+
+    }
+
 }

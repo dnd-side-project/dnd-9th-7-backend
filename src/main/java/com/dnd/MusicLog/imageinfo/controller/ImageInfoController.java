@@ -39,9 +39,9 @@ public class ImageInfoController extends BaseController {
     }
 
     @GetMapping("/image")
-    public ResponseEntity<BaseResponse<FileNamesResponseDto>> searchImages(@RequestHeader(name = "Authorization") String bearerToken) {
+    public ResponseEntity<BaseResponse<String>> searchImages(@RequestHeader(name = "Authorization") String bearerToken) {
         jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        FileNamesResponseDto responseDto = imageInfoService.searchImages(1);
-        return createBaseResponse(HttpStatus.OK, "이미지 조회 완료", responseDto);
+        String fileName = imageInfoService.searchImage(1);
+        return createBaseResponse(HttpStatus.OK, "이미지 조회 완료", fileName);
     }
 }

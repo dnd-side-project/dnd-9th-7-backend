@@ -31,16 +31,11 @@ public class CustomMusic extends BaseTimeEntity {
     @Column(name = "artist", nullable = false)
     private String artist;
 
-    @ManyToOne(targetEntity = User.class)
-    @JoinColumn(name = "user_id")
-    private User author;
-
     @Builder
-    public CustomMusic(String name, String imageUrl, String artist, User author) {
+    public CustomMusic(String name, String imageUrl, String artist) {
         this.name = name;
         this.imageUrl = imageUrl;
         this.artist = artist;
-        this.author = author;
     }
 
     public void updateStaticInfo(String name, String artist, String imageUrl) {

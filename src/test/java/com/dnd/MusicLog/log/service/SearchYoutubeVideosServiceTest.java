@@ -1,6 +1,7 @@
 package com.dnd.MusicLog.log.service;
 
 import com.dnd.MusicLog.log.dto.YoutubeVideoListResponseDto;
+import com.dnd.MusicLog.youtubeinfo.service.SearchYoutubeVideosService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

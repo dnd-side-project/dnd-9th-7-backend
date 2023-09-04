@@ -1,10 +1,10 @@
-package com.dnd.MusicLog.log.controller;
+package com.dnd.MusicLog.youtubeinfo.controller;
 
 import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.log.dto.YoutubeVideoListResponseDto;
-import com.dnd.MusicLog.log.service.SearchYoutubeVideosService;
+import com.dnd.MusicLog.youtubeinfo.service.SearchYoutubeVideosService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

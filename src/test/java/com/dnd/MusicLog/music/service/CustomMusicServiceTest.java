@@ -62,9 +62,9 @@ class CustomMusicServiceTest {
         CustomMusicRequestDto customMusic03 =
             new CustomMusicRequestDto("hello03", "hello03", "newjeans03");
 
-        customMusicService.saveCustomMusic(1, customMusic01);
-        customMusicService.saveCustomMusic(1, customMusic02);
-        customMusicService.saveCustomMusic(1, customMusic03);
+        customMusicService.saveCustomMusic(customMusic01);
+        customMusicService.saveCustomMusic(customMusic02);
+        customMusicService.saveCustomMusic(customMusic03);
     }
 
     @DisplayName("음악 조회 로직 테스트")
@@ -75,39 +75,39 @@ class CustomMusicServiceTest {
         @DisplayName("hello 이름이 포함된 음악이 검색된다.")
         @Test
         void searchHelloSuccess() {
-            SearchCustomMusicResponseDto response = customMusicService.searchCustomMusic(1, "hello", 0, 10);
+            SearchCustomMusicResponseDto response = customMusicService.searchCustomMusic("hello", 0, 10);
             assertThat(response.items()).isNotEmpty();
         }
 
         @DisplayName("검색 시 size 값이 2라면 최대 2개만 반환된다.")
         @Test
         void searchHelloWithSize2() {
-            SearchCustomMusicResponseDto response01 = customMusicService.searchCustomMusic(1, "hello", 0, 2);
+            SearchCustomMusicResponseDto response01 = customMusicService.searchCustomMusic("hello", 0, 2);
             assertThat(response01.items().size()).isEqualTo(2);
-            SearchCustomMusicResponseDto response02 = customMusicService.searchCustomMusic(1, "hello", 1, 2);
+            SearchCustomMusicResponseDto response02 = customMusicService.searchCustomMusic("hello", 1, 2);
             assertThat(response02.items().size()).isEqualTo(1);
-            SearchCustomMusicResponseDto response03 = customMusicService.searchCustomMusic(1, "hello", 2, 2);
+            SearchCustomMusicResponseDto response03 = customMusicService.searchCustomMusic("hello", 2, 2);
             assertThat(response03.items()).isEmpty();
         }
 
         @DisplayName("hello01 이름을 가진 음악은 1개만 존재한다.")
         @Test
         void searchHello01ResponseOneObject() {
-            SearchCustomMusicResponseDto response = customMusicService.searchCustomMusic(1, "hello01", 0, 10);
+            SearchCustomMusicResponseDto response = customMusicService.searchCustomMusic("hello01", 0, 10);
             assertThat(response.items().size()).isEqualTo(1);
         }
 
         @DisplayName("userId가 2일 때는 검색 결과가 존재하지 않는다.")
         @Test
         void searchHelloWithUserId2() {
-            SearchCustomMusicResponseDto response = customMusicService.searchCustomMusic(2, "hello", 0, 10);
+            SearchCustomMusicResponseDto response = customMusicService.searchCustomMusic("hello", 0, 10);
             assertThat(response.items()).isEmpty();
         }
 
         @DisplayName("userId 와 customMusicId 로 음악을 검색하는데 성공한다.")
         @Test
         void searchByUserIdAndCustomMusicId() {
-            CustomMusicItem response = customMusicService.searchCustomMusic(1, 1);
+            CustomMusicItem response = customMusicService.searchCustomMusic(1);
             assertThat(response.getName()).isEqualTo("hello01");
             assertThat(response.getImageUrl()).isEqualTo("hello01");
             assertThat(response.getArtist()).isEqualTo("newjeans01");
@@ -116,7 +116,7 @@ class CustomMusicServiceTest {
         @DisplayName("권한이 없는 음악을 조회하면 존재하지 않는 리소스 에러가 발생한다.")
         @Test
         void searchByIdWithInvalidAuthor() {
-            assertThatThrownBy(() -> customMusicService.searchCustomMusic(2, 1))
+            assertThatThrownBy(() -> customMusicService.searchCustomMusic(2))
                 .isInstanceOf(BusinessLogicException.class);
         }
 
@@ -127,14 +127,13 @@ class CustomMusicServiceTest {
             CustomMusicRequestDto saveCustomMusicRequestDto =
                 new CustomMusicRequestDto("name", "imageUrl", "artist");
             CustomMusicResponseDto saveCustomMusicResponseDto =
-                customMusicService.saveCustomMusic(1, saveCustomMusicRequestDto);
+                customMusicService.saveCustomMusic(saveCustomMusicRequestDto);
 
             // when
             CustomMusicRequestDto updateCustomMusicRequestDto =
                 new CustomMusicRequestDto("updatedName", "updatedImageUrl", "updatedArtist");
             CustomMusicResponseDto updateCustomMusicResponseDto =
-                customMusicService.updateCustomMusic(1, saveCustomMusicResponseDto.getId(),
-                    updateCustomMusicRequestDto);
+                customMusicService.updateCustomMusic(1, updateCustomMusicRequestDto);
 
             // then
             assertThat(updateCustomMusicResponseDto).isNotEqualTo(saveCustomMusicResponseDto);
@@ -147,7 +146,7 @@ class CustomMusicServiceTest {
         @Test
         void updateByIdWithInvalidAuthor() {
             CustomMusicRequestDto request = new CustomMusicRequestDto("name", "image", "artist");
-            assertThatThrownBy(() -> customMusicService.updateCustomMusic(2, 1, request))
+            assertThatThrownBy(() -> customMusicService.updateCustomMusic(2, request))
                 .isInstanceOf(BusinessLogicException.class);
         }
 
@@ -158,23 +157,23 @@ class CustomMusicServiceTest {
             CustomMusicRequestDto saveCustomMusicRequestDto =
                 new CustomMusicRequestDto("hello", "hello", "hello");
             CustomMusicResponseDto saveCustomMusicResponseDto =
-                customMusicService.saveCustomMusic(1, saveCustomMusicRequestDto);
+                customMusicService.saveCustomMusic(saveCustomMusicRequestDto);
 
             // when
             CustomMusicResponseDto response =
-                customMusicService.deleteCustomMusic(1, saveCustomMusicResponseDto.getId());
+                customMusicService.deleteCustomMusic(1);
 
             // then
             assertThat(response).isNotNull();
             // 삭제 이후 조회하면 리소스 없음 에러
-            assertThatThrownBy(() -> customMusicService.deleteCustomMusic(1, response.getId()))
+            assertThatThrownBy(() -> customMusicService.deleteCustomMusic(1))
                 .isInstanceOf(BusinessLogicException.class);
         }
 
         @DisplayName("권한이 없는 음악을 삭제하면 존재하지 않는 리소스 에러가 발생한다.")
         @Test
         void deleteByIdWithInvalidAuthor() {
-            assertThatThrownBy(() -> customMusicService.deleteCustomMusic(2, 1))
+            assertThatThrownBy(() -> customMusicService.deleteCustomMusic(2))
                 .isInstanceOf(BusinessLogicException.class);
         }
     }

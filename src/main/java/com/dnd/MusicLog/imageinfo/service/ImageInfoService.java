@@ -1,10 +1,7 @@
 package com.dnd.MusicLog.imageinfo.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import com.dnd.MusicLog.global.error.exception.BusinessLogicException;
 import com.dnd.MusicLog.global.error.exception.ErrorCode;
 import com.dnd.MusicLog.imageinfo.dto.FileNamesResponseDto;
@@ -23,6 +20,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -32,6 +30,9 @@ public class ImageInfoService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+
+    @Value("${cloud.aws.region.static}")
+    private String region;
 
     private final AmazonS3 amazonS3;
     private final LogRepository logRepository;
@@ -83,10 +84,13 @@ public class ImageInfoService {
 
             fileNameList.add(fileName);
 
+            String imageUrl = "https://s3." + region + ".amazonaws.com/" + bucket + "/" + fileName;
+
             // ImageInfo 객체 생성 후 리스트에 추가
             ImageInfo imageInfo = ImageInfo.builder()
                 .log(log)
                 .imageName(fileName)
+                .imageUrl(imageUrl)
                 .build();
 
             imageInfoList.add(imageInfo);
@@ -110,23 +114,35 @@ public class ImageInfoService {
         amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }
 
-    // TODO : 로그 테이블 생성 후 조인을 이용할 예정
-    public FileNamesResponseDto searchImages(long logId) {
-        List<ImageInfo> imageInfoList = imageInfoRepository.findAllByLogId(logId);
+    @Transactional
+    public void deleteImages(long logId) {
 
-        if (imageInfoList.isEmpty()) {
-            throw new BusinessLogicException(ErrorCode.NOT_FOUND);
+        List<String> fileNames = imageInfoRepository.findAllImageNameByLogIdOrderByCreatedDateAsc(logId);
+
+        for (String fileName : fileNames) {
+            ImageInfo imageInfo = imageInfoRepository.findByImageName(fileName)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
+
+            imageInfoRepository.delete(imageInfo);
         }
 
-        List<String> fileNameList = new ArrayList<>();
+        List<DeleteObjectsRequest.KeyVersion> keys = fileNames.stream()
+            .map(s3Key -> new DeleteObjectsRequest.KeyVersion(s3Key))
+            .collect(Collectors.toList());
 
-        imageInfoList.forEach(imageInfo -> {
-            fileNameList.add(imageInfo.getImageName());
+        if (!keys.isEmpty()) {
+            amazonS3.deleteObjects(new DeleteObjectsRequest(bucket).withKeys(keys));
+        }
+    }
+
+
+    public String searchImage(long logId) {
+        ImageInfo imageInfo = imageInfoRepository.findByLogId(logId).orElseThrow(() -> {
+            throw new BusinessLogicException(ErrorCode.NOT_FOUND);
         });
 
-        return FileNamesResponseDto.builder()
-            .fileNames(fileNameList)
-            .build();
+        return imageInfo.getImageName();
+
     }
 
     private String createFileName(String fileName, String dirName) {

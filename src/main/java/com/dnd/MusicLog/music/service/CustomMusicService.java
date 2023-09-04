@@ -21,15 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CustomMusicService {
 
-    private final OAuthLoginService oAuthLoginService;
     private final CustomMusicRepository customMusicRepository;
 
     @Transactional(readOnly = true)
-    public SearchCustomMusicResponseDto searchCustomMusic(long userId, String query, int offset, int size) {
+    public SearchCustomMusicResponseDto searchCustomMusic(String query, int offset, int size) {
         PageRequest pageRequest = PageRequest.of(offset, size);
 
         List<CustomMusic> customMusic =
-            customMusicRepository.searchAllByUserIdAndQuery(userId, query, pageRequest);
+            customMusicRepository.searchAllByUserIdAndQuery(query, pageRequest);
 
         List<CustomMusicItem> items = customMusic.stream()
             .map(CustomMusicItem::new)
@@ -39,24 +38,21 @@ public class CustomMusicService {
     }
 
     @Transactional(readOnly = true)
-    public CustomMusicItem searchCustomMusic(long userId, long customMusicId) {
-        User user = oAuthLoginService.getUser(userId);
+    public CustomMusicItem searchCustomMusic(long customMusicId) {
 
-        CustomMusic music = customMusicRepository.findByIdAndAuthor(customMusicId, user)
+        CustomMusic music = customMusicRepository.findById(customMusicId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
 
         return new CustomMusicItem(music);
     }
 
     @Transactional
-    public CustomMusicResponseDto saveCustomMusic(long userId, CustomMusicRequestDto requestDto) {
-        User user = oAuthLoginService.getUser(userId);
+    public CustomMusicResponseDto saveCustomMusic(CustomMusicRequestDto requestDto) {
 
         CustomMusic customMusic = CustomMusic.builder()
             .name(requestDto.name())
             .artist(requestDto.artist())
             .imageUrl(requestDto.imageUrl())
-            .author(user)
             .build();
 
         customMusicRepository.save(customMusic);
@@ -66,12 +62,10 @@ public class CustomMusicService {
 
     @Transactional
     public CustomMusicResponseDto updateCustomMusic(
-        long userId,
         long customMusicId,
         CustomMusicRequestDto request) {
-        User user = oAuthLoginService.getUser(userId);
 
-        CustomMusic music = customMusicRepository.findByIdAndAuthor(customMusicId, user)
+        CustomMusic music = customMusicRepository.findById(customMusicId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
 
         music.updateStaticInfo(request.name(), request.artist(), request.imageUrl());
@@ -80,10 +74,9 @@ public class CustomMusicService {
     }
 
     @Transactional
-    public CustomMusicResponseDto deleteCustomMusic(long userId, long customMusicId) {
-        User user = oAuthLoginService.getUser(userId);
+    public CustomMusicResponseDto deleteCustomMusic(long customMusicId) {
 
-        CustomMusic music = customMusicRepository.findByIdAndAuthor(customMusicId, user)
+        CustomMusic music = customMusicRepository.findById(customMusicId)
             .orElseThrow(() -> new BusinessLogicException(ErrorCode.NOT_FOUND));
 
         CustomMusicResponseDto response = new CustomMusicResponseDto(music);

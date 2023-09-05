@@ -109,4 +109,15 @@ public class LogController extends BaseController {
 
     }
 
+    @GetMapping("/temp")
+    public ResponseEntity<BaseResponse<GetTempLogMusicInfoListResponseDto>> getTempLogs(@RequestHeader(name = "Authorization") String bearerToken) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        GetTempLogMusicInfoListResponseDto responseDto = logService.getTempLogs(userId);
+        return createBaseResponse(HttpStatus.OK, "임시저장 로그 정보 조회 완료", responseDto);
+
+    }
+
 }

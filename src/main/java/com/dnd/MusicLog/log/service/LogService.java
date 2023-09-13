@@ -279,4 +279,46 @@ public class LogService {
 
     }
 
+    // 임시저장 기록 리스트 조회
+    @Transactional(readOnly = true)
+    public GetTempLogMusicInfoListResponseDto getTempLogs(long userId) {
+        List<Log> logList = logRepository.findByUserIdAndTemp(userId);
+
+        TempLogMusicInfo tempLogMusicInfo = null;
+        List<TempLogMusicInfo> tempLogMusicInfos = new ArrayList<>();
+
+        for (Log log : logList) {
+
+            List<String> artistList = new ArrayList<>();
+
+            if (log.getMusicType() == MusicType.SPOTIFY) {
+
+                SpotifyItemResponse spotifyItemResponse = spotifyMusicService.searchSpotifyTrack(log.getSpotifyMusic().getSpotifyId());
+
+                List<SpotifyArtistResponse> artists = spotifyItemResponse.artists();
+                for (SpotifyArtistResponse artist: artists) {
+                    artistList.add(artist.name());
+                }
+
+                tempLogMusicInfo = new TempLogMusicInfo(log.getId(), log.getSpotifyMusic().getAlbum().getImageUrl(),
+                    log.getSpotifyMusic().getName(), artistList);
+
+            }
+
+            if (log.getMusicType() == MusicType.CUSTOM) {
+
+                artistList.add(log.getCustomMusic().getArtist());
+
+                tempLogMusicInfo = new TempLogMusicInfo(log.getId(), log.getCustomMusic().getImageUrl(),
+                    log.getCustomMusic().getName(), artistList);
+            }
+
+            tempLogMusicInfos.add(tempLogMusicInfo);
+
+        }
+
+        return new GetTempLogMusicInfoListResponseDto(tempLogMusicInfos);
+    }
+
+
 }

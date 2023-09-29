@@ -10,20 +10,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
+@RequestMapping("/api/youtube")
 @RestController
 public class YoutubeController extends BaseController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final SearchYoutubeVideosService searchYoutubeVideosService;
 
-    @GetMapping("/api/youtube/video")
-    public ResponseEntity<BaseResponse<YoutubeVideoListResponseDto>> searchVideos(@RequestHeader(name = "Authorization") String bearerToken,
-                                                                                  @RequestParam String query,
-                                                                                  @RequestParam(required = false) String pageToken) {
+    @GetMapping("/video")
+    public ResponseEntity<BaseResponse<YoutubeVideoListResponseDto>> searchVideos(
+        @RequestHeader(name = "Authorization") String bearerToken,
+        @RequestParam String query,
+        @RequestParam(required = false) String pageToken) {
 
         jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         YoutubeVideoListResponseDto responseDto = searchYoutubeVideosService.searchYoutubeVideos(query, pageToken);

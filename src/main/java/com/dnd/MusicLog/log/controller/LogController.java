@@ -4,18 +4,31 @@ import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.common.SuccessResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
-import com.dnd.MusicLog.log.dto.*;
+import com.dnd.MusicLog.log.dto.GetFullLogResponseDto;
+import com.dnd.MusicLog.log.dto.GetLogMusicResponseDto;
+import com.dnd.MusicLog.log.dto.GetLogPlayResponseDto;
+import com.dnd.MusicLog.log.dto.GetLogRecordResponseDto;
+import com.dnd.MusicLog.log.dto.GetTempLogMusicInfoListResponseDto;
+import com.dnd.MusicLog.log.dto.SaveLogRequestDto;
+import com.dnd.MusicLog.log.dto.SaveLogResponseDto;
 import com.dnd.MusicLog.log.service.LogService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @RequiredArgsConstructor
-@RequestMapping("/log")
+@RequestMapping("/api/log")
 @RestController
 public class LogController extends BaseController {
 
@@ -24,8 +37,8 @@ public class LogController extends BaseController {
 
     @PostMapping("")
     public ResponseEntity<BaseResponse<SaveLogResponseDto>> saveLog(@RequestHeader(name = "Authorization") String bearerToken,
-                                                              @RequestPart("images") List<MultipartFile> multipartFile,
-                                                              @RequestPart("saveLogRequestDto") SaveLogRequestDto requestDto) {
+        @RequestPart("images") List<MultipartFile> multipartFile,
+        @RequestPart("saveLogRequestDto") SaveLogRequestDto requestDto) {
 
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);
@@ -37,9 +50,9 @@ public class LogController extends BaseController {
 
     @PutMapping("/{logId}")
     public ResponseEntity<SuccessResponse> updateLog(@RequestHeader(name = "Authorization") String bearerToken,
-                                                     @RequestPart("images") List<MultipartFile> multipartFile,
-                                                     @RequestPart("saveLogRequestDto") SaveLogRequestDto requestDto,
-                                                     @PathVariable(name = "logId") long logId) {
+        @RequestPart("images") List<MultipartFile> multipartFile,
+        @RequestPart("saveLogRequestDto") SaveLogRequestDto requestDto,
+        @PathVariable(name = "logId") long logId) {
 
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);
@@ -51,7 +64,7 @@ public class LogController extends BaseController {
 
     @DeleteMapping("/{logId}")
     public ResponseEntity<SuccessResponse> deleteLog(@RequestHeader(name = "Authorization") String bearerToken,
-                                                     @PathVariable(name = "logId") long logId) {
+        @PathVariable(name = "logId") long logId) {
 
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);
@@ -63,7 +76,7 @@ public class LogController extends BaseController {
 
     @GetMapping("/{logId}/music")
     public ResponseEntity<BaseResponse<GetLogMusicResponseDto>> getLogMusic(@RequestHeader(name = "Authorization") String bearerToken,
-                                                                              @PathVariable(name = "logId") long logId) {
+        @PathVariable(name = "logId") long logId) {
 
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);
@@ -75,7 +88,7 @@ public class LogController extends BaseController {
 
     @GetMapping("/{logId}/record")
     public ResponseEntity<BaseResponse<GetLogRecordResponseDto>> getLogRecord(@RequestHeader(name = "Authorization") String bearerToken,
-                                                                 @PathVariable(name = "logId") long logId) {
+        @PathVariable(name = "logId") long logId) {
 
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);
@@ -87,7 +100,7 @@ public class LogController extends BaseController {
 
     @GetMapping("/{logId}/play")
     public ResponseEntity<BaseResponse<GetLogPlayResponseDto>> getLogPlay(@RequestHeader(name = "Authorization") String bearerToken,
-                                                                              @PathVariable(name = "logId") long logId) {
+        @PathVariable(name = "logId") long logId) {
 
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);
@@ -99,7 +112,7 @@ public class LogController extends BaseController {
 
     @GetMapping("/{logId}")
     public ResponseEntity<BaseResponse<GetFullLogResponseDto>> getFullLog(@RequestHeader(name = "Authorization") String bearerToken,
-                                                                            @PathVariable(name = "logId") long logId) {
+        @PathVariable(name = "logId") long logId) {
 
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);
@@ -110,7 +123,8 @@ public class LogController extends BaseController {
     }
 
     @GetMapping("/temp")
-    public ResponseEntity<BaseResponse<GetTempLogMusicInfoListResponseDto>> getTempLogs(@RequestHeader(name = "Authorization") String bearerToken) {
+    public ResponseEntity<BaseResponse<GetTempLogMusicInfoListResponseDto>> getTempLogs(
+        @RequestHeader(name = "Authorization") String bearerToken) {
 
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);

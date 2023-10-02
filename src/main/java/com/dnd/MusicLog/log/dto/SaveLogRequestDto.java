@@ -13,5 +13,5 @@ public record SaveLogRequestDto(@Nullable String spotifyId, @Nullable String loc
                                 @Nullable String review, @Nullable String videoId, @Nullable String title,
                                 @Nullable String channelTitle, @Nullable String publishedAt, LocalDate date, boolean temp,
                                 Feeling feeling, Time time, Weather weather, Season season,
-                                String name, @Nullable String imageUrl, String artist, MusicType musicType) {
+                                @Nullable String name, @Nullable String imageUrl, @Nullable String artist, MusicType musicType) {
 }

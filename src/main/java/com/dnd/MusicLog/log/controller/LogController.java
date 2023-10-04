@@ -4,27 +4,13 @@ import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.common.SuccessResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
-import com.dnd.MusicLog.log.dto.GetFullLogResponseDto;
-import com.dnd.MusicLog.log.dto.GetLogMusicResponseDto;
-import com.dnd.MusicLog.log.dto.GetLogPlayResponseDto;
-import com.dnd.MusicLog.log.dto.GetLogRecordResponseDto;
-import com.dnd.MusicLog.log.dto.GetTempLogMusicInfoListResponseDto;
-import com.dnd.MusicLog.log.dto.SaveLogRequestDto;
-import com.dnd.MusicLog.log.dto.SaveLogResponseDto;
+import com.dnd.MusicLog.log.dto.*;
 import com.dnd.MusicLog.log.service.LogService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
@@ -131,6 +117,19 @@ public class LogController extends BaseController {
 
         GetTempLogMusicInfoListResponseDto responseDto = logService.getTempLogs(userId);
         return createBaseResponse(HttpStatus.OK, "임시저장 로그 정보 조회 완료", responseDto);
+
+    }
+
+    @GetMapping("/calender/day/{date}")
+    public ResponseEntity<BaseResponse<List<GetDayCalenderInfoResponseDto>>> getDayCalenderInfo(
+        @RequestHeader(name = "Authorization") String bearerToken,
+        @PathVariable(name = "date") String date) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        List<GetDayCalenderInfoResponseDto> responseDto = logService.getDayCalenderInfo(userId, date);
+        return createBaseResponse(HttpStatus.OK, "일별 캘린더 로그 정보 조회 완료", responseDto);
 
     }
 

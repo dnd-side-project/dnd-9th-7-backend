@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -320,5 +322,58 @@ public class LogService {
         return new GetTempLogMusicInfoListResponseDto(tempLogMusicInfos);
     }
 
+//    // 캘린더 월별 데이터 제공
+//    @Transactional(readOnly = true)
+//    public GetMonthCalenderInfoResponseDto getMonthCalenderInfo(LocalDate date, long userId) {
+//
+//        // 저번달 데이터
+//        // 이번달 데이터(해당 년도, 월, 앨범 커버 + 일, 기록한 날짜 개수, 기록 개수)
+//
+//        // 다음달 데이터
+//    }
 
+    // 캘린더 일별 데이터 제공
+    @Transactional(readOnly = true)
+    public List<GetDayCalenderInfoResponseDto> getDayCalenderInfo(long userId, String date) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate localDate = LocalDate.parse(date, formatter);
+        System.out.println(localDate);
+
+        List<Log> logList = logRepository.findAllByUserIdAndDay(userId, localDate);
+
+        List<GetDayCalenderInfoResponseDto> getDayCalenderInfos = new ArrayList<>();
+
+        for (Log log : logList) {
+
+            List<String> artistList = new ArrayList<>();
+
+            if (log.getMusicType() == MusicType.SPOTIFY) {
+
+                SpotifyItemResponse spotifyItemResponse = spotifyMusicService.searchSpotifyTrack(log.getSpotifyMusic().getSpotifyId());
+
+                List<SpotifyArtistResponse> artists = spotifyItemResponse.artists();
+                for (SpotifyArtistResponse artist: artists) {
+                    artistList.add(artist.name());
+                }
+
+                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(
+                    log.getSpotifyMusic().getAlbum().getImageUrl(), artistList, log.getSpotifyMusic().getName(), log.isRepresentation());
+
+                getDayCalenderInfos.add(getDayCalenderInfoResponseDto);
+            }
+
+            if (log.getMusicType() == MusicType.CUSTOM) {
+
+                artistList.add(log.getCustomMusic().getArtist());
+                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(
+                    log.getCustomMusic().getImageUrl(), artistList, log.getCustomMusic().getName(), log.isRepresentation());
+
+                getDayCalenderInfos.add(getDayCalenderInfoResponseDto);
+
+            }
+        }
+
+        return getDayCalenderInfos;
+    }
 }

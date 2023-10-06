@@ -322,7 +322,7 @@ public class LogService {
         return new GetTempLogMusicInfoListResponseDto(tempLogMusicInfos);
     }
 
-//    // 캘린더 월별 데이터 제공
+    // 캘린더 월별 데이터 제공
 //    @Transactional(readOnly = true)
 //    public GetMonthCalenderInfoResponseDto getMonthCalenderInfo(LocalDate date, long userId) {
 //
@@ -357,7 +357,7 @@ public class LogService {
                     artistList.add(artist.name());
                 }
 
-                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(
+                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(log.getId(),
                     log.getSpotifyMusic().getAlbum().getImageUrl(), artistList, log.getSpotifyMusic().getName(), log.isRepresentation());
 
                 getDayCalenderInfos.add(getDayCalenderInfoResponseDto);
@@ -366,7 +366,7 @@ public class LogService {
             if (log.getMusicType() == MusicType.CUSTOM) {
 
                 artistList.add(log.getCustomMusic().getArtist());
-                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(
+                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(log.getId(),
                     log.getCustomMusic().getImageUrl(), artistList, log.getCustomMusic().getName(), log.isRepresentation());
 
                 getDayCalenderInfos.add(getDayCalenderInfoResponseDto);

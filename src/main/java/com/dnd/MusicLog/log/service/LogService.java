@@ -404,6 +404,7 @@ public class LogService {
             }
         }
 
-        return new MonthLogInfo(calenderlogCountinfo.dayCount(), calenderlogCountinfo.recordCount(), calenderAlbumImageInfoList);
+        return new MonthLogInfo(localDate.getYear(), localDate.getMonthValue(), calenderlogCountinfo.dayCount(),
+            calenderlogCountinfo.recordCount(), calenderAlbumImageInfoList);
     }
 }

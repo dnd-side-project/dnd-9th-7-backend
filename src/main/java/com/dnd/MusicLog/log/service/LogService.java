@@ -323,14 +323,18 @@ public class LogService {
     }
 
     // 캘린더 월별 데이터 제공
-//    @Transactional(readOnly = true)
-//    public GetMonthCalenderInfoResponseDto getMonthCalenderInfo(LocalDate date, long userId) {
-//
-//        // 저번달 데이터
-//        // 이번달 데이터(해당 년도, 월, 앨범 커버 + 일, 기록한 날짜 개수, 기록 개수)
-//
-//        // 다음달 데이터
-//    }
+    @Transactional(readOnly = true)
+    public GetMonthCalenderInfoResponseDto getMonthCalenderInfo(long userId, String date) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate thisMonthlocalDate = LocalDate.parse(date, formatter);
+
+        MonthLogInfo lastMonthLogInfo = generateMonthLogInfo(userId, thisMonthlocalDate.minusMonths(1));
+        MonthLogInfo thisMonthLogInfo = generateMonthLogInfo(userId, thisMonthlocalDate);
+        MonthLogInfo nextMonthLogInfo = generateMonthLogInfo(userId, thisMonthlocalDate.plusMonths(1));
+
+        return new GetMonthCalenderInfoResponseDto(lastMonthLogInfo, thisMonthLogInfo, nextMonthLogInfo);
+    }
 
     // 캘린더 일별 데이터 제공
     @Transactional(readOnly = true)
@@ -338,7 +342,6 @@ public class LogService {
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
         LocalDate localDate = LocalDate.parse(date, formatter);
-        System.out.println(localDate);
 
         List<Log> logList = logRepository.findAllByUserIdAndDay(userId, localDate);
 
@@ -375,5 +378,32 @@ public class LogService {
         }
 
         return getDayCalenderInfos;
+    }
+
+    private MonthLogInfo generateMonthLogInfo(long userId, LocalDate localDate) {
+
+        List<CalenderAlbumImageInfo> calenderAlbumImageInfoList = new ArrayList<>();
+
+        Object[] logCountInfosList = logRepository.findDayCountAndRecordCountInfo(userId, localDate);
+
+        Object[] results= (Object[]) logCountInfosList[0];
+        CalenderLogCountInfo calenderlogCountinfo =
+            new CalenderLogCountInfo(((Long) results[0]), ((Long) results[1]));
+
+        List<Log> logList= logRepository.findAllByUserIdAndMonth(userId , localDate);
+
+        for (Log log : logList ) {
+            if (log.getMusicType() == MusicType.SPOTIFY) {
+                calenderAlbumImageInfoList.add(new CalenderAlbumImageInfo(log.getDate(),
+                    log.getSpotifyMusic().getAlbum().getImageUrl()));
+            }
+
+            if (log.getMusicType() == MusicType.CUSTOM){
+                calenderAlbumImageInfoList.add(new CalenderAlbumImageInfo(log.getDate(),
+                    log.getCustomMusic().getImageUrl()));
+            }
+        }
+
+        return new MonthLogInfo(calenderlogCountinfo.dayCount(), calenderlogCountinfo.recordCount(), calenderAlbumImageInfoList);
     }
 }

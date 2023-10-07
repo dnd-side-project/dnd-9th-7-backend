@@ -146,4 +146,17 @@ public class LogController extends BaseController {
 
     }
 
+    @PutMapping("/calender/day/{date}/{logId}")
+    public ResponseEntity<BaseResponse<List<GetDayCalenderInfoResponseDto>>> updateRepresentationImage(
+        @RequestHeader(name = "Authorization") String bearerToken,
+        @PathVariable(name = "date") String date, @PathVariable(name = "logId") long logId) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        List<GetDayCalenderInfoResponseDto> responseDto = logService.updateRepresentationImage(userId, date, logId);
+        return createBaseResponse(HttpStatus.OK, "대표 이미지 설정 및 변경 완료", responseDto);
+
+    }
+
 }

@@ -20,12 +20,30 @@ public interface LogRepository extends JpaRepository<Log, Long> {
     @Query("SELECT l FROM Log l WHERE l.user.id = :userId AND l.temp = true ORDER BY l.lastModifiedDate DESC")
     List<Log> findByUserIdAndTemp(@Param("userId") long userId);
 
-    // 월별 캘린더 정보 제공 (해당 년도, 월, 앨범 커버 + 일, 기록한 날짜 개수, 기록 개수)
-//    @Query("SELECT l " +
-//        "FROM Log l " +
-//        "WHERE l.user.id = :userId AND l.temp = false " +
-//        "GROUP BY l.date ORDER BY l.lastModifiedDate DESC")
-//    List<Log> findAllByUserIdAndDate(@Param("userId") long userId, String year, String month);
+    // 기록 날짜 개수 및 기록 개수
+    @Query(value = """
+    SELECT 
+        (SELECT COUNT(distinct (log.date)) FROM log WHERE YEAR(date) = YEAR(:date) AND MONTH(date) = MONTH(:date) AND temp = false AND log.user_id = :userId),
+        (SELECT COUNT(distinct (log.id)) FROM log WHERE YEAR(date) = YEAR(:date) AND MONTH(date) = MONTH(:date) AND temp = false AND log.user_id = :userId)
+""", nativeQuery = true)
+    Object[] findDayCountAndRecordCountInfo(@Param("userId") long userId, @Param("date") LocalDate date);
+
+
+    // 월별 캘린더 정보 제공
+    @Query(value = """
+    WITH ranked_logs AS (
+        SELECT *,
+               ROW_NUMBER() OVER (PARTITION BY date
+                   ORDER BY representation DESC, last_modified_date DESC) AS rn
+        FROM log
+        WHERE YEAR(date) = YEAR(:date) AND MONTH(date) = MONTH(:date) AND temp = false AND user_id = :userId
+    )
+    
+    SELECT *
+    FROM log
+    WHERE id in (select id from ranked_logs where rn = 1 )
+""", nativeQuery = true)
+    List<Log> findAllByUserIdAndMonth(@Param("userId") long userId, @Param("date") LocalDate date);
 
     // 일별 캘린더 정보 제공
     @Query("SELECT l FROM Log l WHERE l.user.id = :userId AND YEAR(l.date) = YEAR(:date) AND MONTH(l.date) = MONTH(:date) " +

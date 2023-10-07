@@ -120,6 +120,19 @@ public class LogController extends BaseController {
 
     }
 
+    @GetMapping("/calender/month/{date}")
+    public ResponseEntity<BaseResponse<GetMonthCalenderInfoResponseDto>> getMonthCalenderInfo(
+        @RequestHeader(name = "Authorization") String bearerToken,
+        @PathVariable(name = "date") String date) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        GetMonthCalenderInfoResponseDto responseDto = logService.getMonthCalenderInfo(userId, date);
+        return createBaseResponse(HttpStatus.OK, "월별 캘린더 로그 정보 조회 완료", responseDto);
+
+    }
+
     @GetMapping("/calender/day/{date}")
     public ResponseEntity<BaseResponse<List<GetDayCalenderInfoResponseDto>>> getDayCalenderInfo(
         @RequestHeader(name = "Authorization") String bearerToken,

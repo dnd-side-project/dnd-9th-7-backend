@@ -47,7 +47,7 @@ public interface LogRepository extends JpaRepository<Log, Long> {
     List<Log> findAllByUserIdAndMonth(@Param("userId") long userId, @Param("date") LocalDate date);
 
     // 일별 캘린더 정보 제공
-    @Query("SELECT l FROM Log l WHERE l.user.id = :userId AND YEAR(l.date) = YEAR(:date) AND MONTH(l.date) = MONTH(:date) " +
+    @Query("SELECT l FROM Log l left join fetch l.customMusic c left join fetch l.spotifyMusic s WHERE l.user.id = :userId AND YEAR(l.date) = YEAR(:date) AND MONTH(l.date) = MONTH(:date) " +
         "AND DAY(l.date) = DAY(:date) AND l.temp = false ORDER BY l.representation DESC ,l.lastModifiedDate DESC")
     List<Log> findAllByUserIdAndDay(@Param("userId") long userId, @Param("date") LocalDate date);
 

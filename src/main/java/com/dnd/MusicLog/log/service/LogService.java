@@ -380,6 +380,51 @@ public class LogService {
         return getDayCalenderInfos;
     }
 
+    // 대표 이미지 설정 및 변경하기
+    @Transactional
+    public List<GetDayCalenderInfoResponseDto> updateRepresentationImage(long userId, String date, long logId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate localDate = LocalDate.parse(date, formatter);
+
+        logRepository.updateRepresentationImage(userId, localDate, logId);
+
+        List<Log> logList = logRepository.findAllByUserIdAndDay(userId, localDate);
+
+        List<GetDayCalenderInfoResponseDto> getDayCalenderInfos = new ArrayList<>();
+
+        for (Log log : logList) {
+
+            List<String> artistList = new ArrayList<>();
+
+            if (log.getMusicType() == MusicType.SPOTIFY) {
+
+                SpotifyItemResponse spotifyItemResponse = spotifyMusicService.searchSpotifyTrack(log.getSpotifyMusic().getSpotifyId());
+
+                List<SpotifyArtistResponse> artists = spotifyItemResponse.artists();
+                for (SpotifyArtistResponse artist: artists) {
+                    artistList.add(artist.name());
+                }
+
+                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(log.getId(),
+                    log.getSpotifyMusic().getAlbum().getImageUrl(), artistList, log.getSpotifyMusic().getName(), log.isRepresentation());
+
+                getDayCalenderInfos.add(getDayCalenderInfoResponseDto);
+            }
+
+            if (log.getMusicType() == MusicType.CUSTOM) {
+
+                artistList.add(log.getCustomMusic().getArtist());
+                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(log.getId(),
+                    log.getCustomMusic().getImageUrl(), artistList, log.getCustomMusic().getName(), log.isRepresentation());
+
+                getDayCalenderInfos.add(getDayCalenderInfoResponseDto);
+
+            }
+        }
+
+        return getDayCalenderInfos;
+    }
+
     private MonthLogInfo generateMonthLogInfo(long userId, LocalDate localDate) {
 
         List<CalenderAlbumImageInfo> calenderAlbumImageInfoList = new ArrayList<>();

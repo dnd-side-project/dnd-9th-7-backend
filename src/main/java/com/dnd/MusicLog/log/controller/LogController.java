@@ -159,4 +159,16 @@ public class LogController extends BaseController {
 
     }
 
+    @GetMapping("/myplaylist")
+    public ResponseEntity<BaseResponse<GetCategoryStatusDto>> findPopulatedCategories(
+        @RequestHeader(name = "Authorization") String bearerToken) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        GetCategoryStatusDto responseDto = logService.findPopulatedCategories(userId);
+        return createBaseResponse(HttpStatus.OK, "카테고리 활성화 여부 조회 완료", responseDto);
+
+    }
+
 }

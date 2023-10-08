@@ -61,16 +61,16 @@ public interface LogRepository extends JpaRepository<Log, Long> {
         "AND l.temp = false AND YEAR(l.date) = YEAR(:date) AND MONTH(l.date) = MONTH(:date) AND DAY(l.date) = DAY(:date)", nativeQuery = true)
     void updateRepresentationImage(@Param("userId") long userId, @Param("date") LocalDate date, @Param("logId") long logId);
 
-    @Query("SELECT DISTINCT l.feeling FROM Log l WHERE l.user.id = :userId")
+    @Query("SELECT DISTINCT l.feeling FROM Log l WHERE l.user.id = :userId AND l.temp = false")
     List<Feeling> findDistinctFeelings(@Param("userId") long userId);
 
-    @Query("SELECT DISTINCT l.time FROM Log l WHERE l.user.id = :userId")
+    @Query("SELECT DISTINCT l.time FROM Log l WHERE l.user.id = :userId AND l.temp = false")
     List<Time> findDistinctTimes(@Param("userId") long userId);
 
-    @Query("SELECT DISTINCT l.weather FROM Log l WHERE l.user.id = :userId")
+    @Query("SELECT DISTINCT l.weather FROM Log l WHERE l.user.id = :userId AND l.temp = false")
     List<Weather> findDistinctWeathers(@Param("userId") long userId);
 
-    @Query("SELECT DISTINCT l.season FROM Log l WHERE l.user.id = :userId")
+    @Query("SELECT DISTINCT l.season FROM Log l WHERE l.user.id = :userId AND l.temp = false")
     List<Season> findDistinctSeasons(@Param("userId") long userId);
 
 }

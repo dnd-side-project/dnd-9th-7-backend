@@ -6,6 +6,10 @@ import com.dnd.MusicLog.imageinfo.repository.ImageInfoRepository;
 import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
 import com.dnd.MusicLog.log.dto.*;
 import com.dnd.MusicLog.log.entity.Log;
+import com.dnd.MusicLog.log.enums.Feeling;
+import com.dnd.MusicLog.log.enums.Season;
+import com.dnd.MusicLog.log.enums.Time;
+import com.dnd.MusicLog.log.enums.Weather;
 import com.dnd.MusicLog.log.repository.LogRepository;
 import com.dnd.MusicLog.music.dto.CustomMusicRequestDto;
 import com.dnd.MusicLog.music.dto.CustomMusicResponseDto;
@@ -31,6 +35,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.dnd.MusicLog.log.enums.Feeling.*;
+import static com.dnd.MusicLog.log.enums.Season.*;
+import static com.dnd.MusicLog.log.enums.Time.*;
+import static com.dnd.MusicLog.log.enums.Weather.*;
 
 @RequiredArgsConstructor
 @Service
@@ -451,5 +460,99 @@ public class LogService {
 
         return new MonthLogInfo(localDate.getYear(), localDate.getMonthValue(), calenderlogCountinfo.dayCount(),
             calenderlogCountinfo.recordCount(), calenderAlbumImageInfoList);
+    }
+
+    // 마이플레이리스트 필터(카테고리 활성 여부 정보)
+    @Transactional(readOnly = true)
+    public GetCategoryStatusDto findPopulatedCategories(long userId) {
+
+        List<Feeling> feelingList = logRepository.findDistinctFeelings(userId);
+        List<Time> timeList = logRepository.findDistinctTimes(userId);
+        List<Weather> weatherList = logRepository.findDistinctWeathers(userId);
+        List<Season> seasonList = logRepository.findDistinctSeasons(userId);
+
+        GetCategoryStatusDto getCategoryStatusDto = new GetCategoryStatusDto();
+
+        for (Feeling feeling : feelingList) {
+            switch (feeling.name()) {
+                case "HAPPINESS":
+                    getCategoryStatusDto.setHAPPINESS(true);
+                    break;
+                case "EXCITEMENT":
+                    getCategoryStatusDto.setEXCITEMENT(true);
+                    break;
+                case "FLUTTER":
+                    getCategoryStatusDto.setFLUTTER(true);
+                    break;
+                case "SERENITY":
+                    getCategoryStatusDto.setSERENITY(true);
+                    break;
+                case "EMPTINESS":
+                    getCategoryStatusDto.setEMPTINESS(true);
+                    break;
+                case "DEPRESSION":
+                    getCategoryStatusDto.setDEPRESSION(true);
+                    break;
+                case "SADNESS":
+                    getCategoryStatusDto.setSADNESS(true);
+                    break;
+                case "ANGER":
+                    getCategoryStatusDto.setANGER(true);
+                    break;
+            }
+        }
+
+        for (Time time : timeList) {
+            switch (time.name()) {
+                case "MORNING":
+                    getCategoryStatusDto.setMORNING(true);
+                    break;
+                case "LUNCH":
+                    getCategoryStatusDto.setLUNCH(true);
+                    break;
+                case "DINNER":
+                    getCategoryStatusDto.setDINNER(true);
+                    break;
+                case "DAWN":
+                    getCategoryStatusDto.setDAWN(true);
+                    break;
+            }
+        }
+
+        for (Weather weather : weatherList) {
+            switch (weather.name()) {
+                case "SUNNY":
+                    getCategoryStatusDto.setSUNNY(true);
+                    break;
+                case "CLOUDY":
+                    getCategoryStatusDto.setCLOUDY(true);
+                    break;
+                case "RAIN":
+                    getCategoryStatusDto.setRAIN(true);
+                    break;
+                case "SNOW":
+                    getCategoryStatusDto.setSNOW(true);
+                    break;
+            }
+        }
+
+        for (Season season : seasonList) {
+            switch (season.name()) {
+                case "SPRING":
+                    getCategoryStatusDto.setSPRING(true);
+                    break;
+                case "SUMMER":
+                    getCategoryStatusDto.setSUMMER(true);
+                    break;
+                case "AUTUMN":
+                    getCategoryStatusDto.setAUTUMN(true);
+                    break;
+                case "WINTER":
+                    getCategoryStatusDto.setWINTER(true);
+                    break;
+            }
+        }
+
+        return getCategoryStatusDto;
     }
 }

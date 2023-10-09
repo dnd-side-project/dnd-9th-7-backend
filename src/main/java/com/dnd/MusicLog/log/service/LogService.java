@@ -10,6 +10,7 @@ import com.dnd.MusicLog.log.enums.Feeling;
 import com.dnd.MusicLog.log.enums.Season;
 import com.dnd.MusicLog.log.enums.Time;
 import com.dnd.MusicLog.log.enums.Weather;
+import com.dnd.MusicLog.log.repository.LogByCategoryRepository;
 import com.dnd.MusicLog.log.repository.LogRepository;
 import com.dnd.MusicLog.music.dto.CustomMusicRequestDto;
 import com.dnd.MusicLog.music.dto.CustomMusicResponseDto;
@@ -36,11 +37,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dnd.MusicLog.log.enums.Feeling.*;
-import static com.dnd.MusicLog.log.enums.Season.*;
-import static com.dnd.MusicLog.log.enums.Time.*;
-import static com.dnd.MusicLog.log.enums.Weather.*;
-
 @RequiredArgsConstructor
 @Service
 public class LogService {
@@ -54,6 +50,7 @@ public class LogService {
     private final ImageInfoRepository imageInfoRepository;
     private final SpotifyMusicRepository spotifyMusicRepository;
     private final CustomMusicRepository customMusicRepository;
+    private final LogByCategoryRepository logByCategoryRepository;
 
     @Transactional
     public SaveLogResponseDto saveLog(long userId, SaveLogRequestDto requestDto, List<MultipartFile> multipartFile) {
@@ -471,33 +468,37 @@ public class LogService {
         List<Weather> weatherList = logRepository.findDistinctWeathers(userId);
         List<Season> seasonList = logRepository.findDistinctSeasons(userId);
 
-        GetCategoryStatusDto getCategoryStatusDto = new GetCategoryStatusDto();
+        GetFeelingStatusDto getFeelingStatusDto = new GetFeelingStatusDto();
+        GetTimeStatusDto getTimeStatusDto = new GetTimeStatusDto();
+        GetWeatherStatusDto getWeatherStatusDto = new GetWeatherStatusDto();
+        GetSeasonStatusDto getSeasonStatusDto = new GetSeasonStatusDto();
+
 
         for (Feeling feeling : feelingList) {
             switch (feeling.name()) {
                 case "HAPPINESS":
-                    getCategoryStatusDto.setHAPPINESS(true);
+                    getFeelingStatusDto.setHAPPINESS(true);
                     break;
                 case "EXCITEMENT":
-                    getCategoryStatusDto.setEXCITEMENT(true);
+                    getFeelingStatusDto.setEXCITEMENT(true);
                     break;
                 case "FLUTTER":
-                    getCategoryStatusDto.setFLUTTER(true);
+                    getFeelingStatusDto.setFLUTTER(true);
                     break;
                 case "SERENITY":
-                    getCategoryStatusDto.setSERENITY(true);
+                    getFeelingStatusDto.setSERENITY(true);
                     break;
                 case "EMPTINESS":
-                    getCategoryStatusDto.setEMPTINESS(true);
+                    getFeelingStatusDto.setEMPTINESS(true);
                     break;
                 case "DEPRESSION":
-                    getCategoryStatusDto.setDEPRESSION(true);
+                    getFeelingStatusDto.setDEPRESSION(true);
                     break;
                 case "SADNESS":
-                    getCategoryStatusDto.setSADNESS(true);
+                    getFeelingStatusDto.setSADNESS(true);
                     break;
                 case "ANGER":
-                    getCategoryStatusDto.setANGER(true);
+                    getFeelingStatusDto.setANGER(true);
                     break;
             }
         }
@@ -505,16 +506,16 @@ public class LogService {
         for (Time time : timeList) {
             switch (time.name()) {
                 case "MORNING":
-                    getCategoryStatusDto.setMORNING(true);
+                    getTimeStatusDto.setMORNING(true);
                     break;
                 case "LUNCH":
-                    getCategoryStatusDto.setLUNCH(true);
+                    getTimeStatusDto.setLUNCH(true);
                     break;
                 case "DINNER":
-                    getCategoryStatusDto.setDINNER(true);
+                    getTimeStatusDto.setDINNER(true);
                     break;
                 case "DAWN":
-                    getCategoryStatusDto.setDAWN(true);
+                    getTimeStatusDto.setDAWN(true);
                     break;
             }
         }
@@ -522,16 +523,16 @@ public class LogService {
         for (Weather weather : weatherList) {
             switch (weather.name()) {
                 case "SUNNY":
-                    getCategoryStatusDto.setSUNNY(true);
+                    getWeatherStatusDto.setSUNNY(true);
                     break;
                 case "CLOUDY":
-                    getCategoryStatusDto.setCLOUDY(true);
+                    getWeatherStatusDto.setCLOUDY(true);
                     break;
                 case "RAIN":
-                    getCategoryStatusDto.setRAIN(true);
+                    getWeatherStatusDto.setRAIN(true);
                     break;
                 case "SNOW":
-                    getCategoryStatusDto.setSNOW(true);
+                    getWeatherStatusDto.setSNOW(true);
                     break;
             }
         }
@@ -539,20 +540,25 @@ public class LogService {
         for (Season season : seasonList) {
             switch (season.name()) {
                 case "SPRING":
-                    getCategoryStatusDto.setSPRING(true);
+                    getSeasonStatusDto.setSPRING(true);
                     break;
                 case "SUMMER":
-                    getCategoryStatusDto.setSUMMER(true);
+                    getSeasonStatusDto.setSUMMER(true);
                     break;
                 case "AUTUMN":
-                    getCategoryStatusDto.setAUTUMN(true);
+                    getSeasonStatusDto.setAUTUMN(true);
                     break;
                 case "WINTER":
-                    getCategoryStatusDto.setWINTER(true);
+                    getSeasonStatusDto.setWINTER(true);
                     break;
             }
         }
+        return new GetCategoryStatusDto(getFeelingStatusDto, getTimeStatusDto, getWeatherStatusDto, getSeasonStatusDto);
+    }
 
-        return getCategoryStatusDto;
+    @Transactional(readOnly = true)
+    public Long findRecordCountByCategory(long userId, Feeling feeling, Time time, Weather weather,
+                                                        Season season) {
+        return logByCategoryRepository.findRecordCountByCategory(userId, feeling, time, weather, season);
     }
 }

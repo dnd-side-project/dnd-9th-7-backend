@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -320,5 +322,134 @@ public class LogService {
         return new GetTempLogMusicInfoListResponseDto(tempLogMusicInfos);
     }
 
+    // 캘린더 월별 데이터 제공
+    @Transactional(readOnly = true)
+    public GetMonthCalenderInfoResponseDto getMonthCalenderInfo(long userId, String date) {
 
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate thisMonthlocalDate = LocalDate.parse(date, formatter);
+
+        MonthLogInfo lastMonthLogInfo = generateMonthLogInfo(userId, thisMonthlocalDate.minusMonths(1));
+        MonthLogInfo thisMonthLogInfo = generateMonthLogInfo(userId, thisMonthlocalDate);
+        MonthLogInfo nextMonthLogInfo = generateMonthLogInfo(userId, thisMonthlocalDate.plusMonths(1));
+
+        return new GetMonthCalenderInfoResponseDto(lastMonthLogInfo, thisMonthLogInfo, nextMonthLogInfo);
+    }
+
+    // 캘린더 일별 데이터 제공
+    @Transactional(readOnly = true)
+    public List<GetDayCalenderInfoResponseDto> getDayCalenderInfo(long userId, String date) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate localDate = LocalDate.parse(date, formatter);
+
+        List<Log> logList = logRepository.findAllByUserIdAndDay(userId, localDate);
+
+        List<GetDayCalenderInfoResponseDto> getDayCalenderInfos = new ArrayList<>();
+
+        for (Log log : logList) {
+
+            List<String> artistList = new ArrayList<>();
+
+            if (log.getMusicType() == MusicType.SPOTIFY) {
+
+                SpotifyItemResponse spotifyItemResponse = spotifyMusicService.searchSpotifyTrack(log.getSpotifyMusic().getSpotifyId());
+
+                List<SpotifyArtistResponse> artists = spotifyItemResponse.artists();
+                for (SpotifyArtistResponse artist: artists) {
+                    artistList.add(artist.name());
+                }
+
+                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(log.getId(),
+                    log.getSpotifyMusic().getAlbum().getImageUrl(), artistList, log.getSpotifyMusic().getName(), log.isRepresentation());
+
+                getDayCalenderInfos.add(getDayCalenderInfoResponseDto);
+            }
+
+            if (log.getMusicType() == MusicType.CUSTOM) {
+
+                artistList.add(log.getCustomMusic().getArtist());
+                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(log.getId(),
+                    log.getCustomMusic().getImageUrl(), artistList, log.getCustomMusic().getName(), log.isRepresentation());
+
+                getDayCalenderInfos.add(getDayCalenderInfoResponseDto);
+
+            }
+        }
+
+        return getDayCalenderInfos;
+    }
+
+    // 대표 이미지 설정 및 변경하기
+    @Transactional
+    public List<GetDayCalenderInfoResponseDto> updateRepresentationImage(long userId, String date, long logId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate localDate = LocalDate.parse(date, formatter);
+
+        logRepository.updateRepresentationImage(userId, localDate, logId);
+
+        List<Log> logList = logRepository.findAllByUserIdAndDay(userId, localDate);
+
+        List<GetDayCalenderInfoResponseDto> getDayCalenderInfos = new ArrayList<>();
+
+        for (Log log : logList) {
+
+            List<String> artistList = new ArrayList<>();
+
+            if (log.getMusicType() == MusicType.SPOTIFY) {
+
+                SpotifyItemResponse spotifyItemResponse = spotifyMusicService.searchSpotifyTrack(log.getSpotifyMusic().getSpotifyId());
+
+                List<SpotifyArtistResponse> artists = spotifyItemResponse.artists();
+                for (SpotifyArtistResponse artist: artists) {
+                    artistList.add(artist.name());
+                }
+
+                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(log.getId(),
+                    log.getSpotifyMusic().getAlbum().getImageUrl(), artistList, log.getSpotifyMusic().getName(), log.isRepresentation());
+
+                getDayCalenderInfos.add(getDayCalenderInfoResponseDto);
+            }
+
+            if (log.getMusicType() == MusicType.CUSTOM) {
+
+                artistList.add(log.getCustomMusic().getArtist());
+                GetDayCalenderInfoResponseDto getDayCalenderInfoResponseDto = new GetDayCalenderInfoResponseDto(log.getId(),
+                    log.getCustomMusic().getImageUrl(), artistList, log.getCustomMusic().getName(), log.isRepresentation());
+
+                getDayCalenderInfos.add(getDayCalenderInfoResponseDto);
+
+            }
+        }
+
+        return getDayCalenderInfos;
+    }
+
+    private MonthLogInfo generateMonthLogInfo(long userId, LocalDate localDate) {
+
+        List<CalenderAlbumImageInfo> calenderAlbumImageInfoList = new ArrayList<>();
+
+        Object[] logCountInfosList = logRepository.findDayCountAndRecordCountInfo(userId, localDate);
+
+        Object[] results= (Object[]) logCountInfosList[0];
+        CalenderLogCountInfo calenderlogCountinfo =
+            new CalenderLogCountInfo(((Long) results[0]), ((Long) results[1]));
+
+        List<Log> logList= logRepository.findAllByUserIdAndMonth(userId , localDate);
+
+        for (Log log : logList ) {
+            if (log.getMusicType() == MusicType.SPOTIFY) {
+                calenderAlbumImageInfoList.add(new CalenderAlbumImageInfo(log.getDate(),
+                    log.getSpotifyMusic().getAlbum().getImageUrl()));
+            }
+
+            if (log.getMusicType() == MusicType.CUSTOM){
+                calenderAlbumImageInfoList.add(new CalenderAlbumImageInfo(log.getDate(),
+                    log.getCustomMusic().getImageUrl()));
+            }
+        }
+
+        return new MonthLogInfo(localDate.getYear(), localDate.getMonthValue(), calenderlogCountinfo.dayCount(),
+            calenderlogCountinfo.recordCount(), calenderAlbumImageInfoList);
+    }
 }

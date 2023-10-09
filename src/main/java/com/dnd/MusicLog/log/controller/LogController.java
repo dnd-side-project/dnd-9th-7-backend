@@ -5,6 +5,10 @@ import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.common.SuccessResponse;
 import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.log.dto.*;
+import com.dnd.MusicLog.log.enums.Feeling;
+import com.dnd.MusicLog.log.enums.Season;
+import com.dnd.MusicLog.log.enums.Time;
+import com.dnd.MusicLog.log.enums.Weather;
 import com.dnd.MusicLog.log.service.LogService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -168,6 +172,23 @@ public class LogController extends BaseController {
 
         GetCategoryStatusDto responseDto = logService.findPopulatedCategories(userId);
         return createBaseResponse(HttpStatus.OK, "카테고리 활성화 여부 조회 완료", responseDto);
+
+    }
+
+    @GetMapping("/myplaylist/category")
+    public ResponseEntity<BaseResponse<Long>> findPopulatedCategories(
+        @RequestHeader(name = "Authorization", required = false) String bearerToken,
+        @RequestParam(name = "feeling", required = false) Feeling feeling,
+        @RequestParam(name = "time", required = false) Time time,
+        @RequestParam(name = "weather", required = false) Weather weather,
+        @RequestParam(name = "season", required = false) Season season
+        ) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        long responseDto = logService.findRecordCountByCategory(userId, feeling, time, weather, season);
+        return createBaseResponse(HttpStatus.OK, "카테고리별 기록 개수 조회 완료", responseDto);
 
     }
 

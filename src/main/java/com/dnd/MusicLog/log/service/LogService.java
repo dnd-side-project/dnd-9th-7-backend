@@ -7,7 +7,7 @@ import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
 import com.dnd.MusicLog.log.dto.*;
 import com.dnd.MusicLog.log.entity.Log;
 import com.dnd.MusicLog.log.enums.*;
-import com.dnd.MusicLog.log.repository.LogByCategoryRepository;
+import com.dnd.MusicLog.log.repository.LogByFilterRepository;
 import com.dnd.MusicLog.log.repository.LogRepository;
 import com.dnd.MusicLog.music.dto.CustomMusicRequestDto;
 import com.dnd.MusicLog.music.dto.CustomMusicResponseDto;
@@ -49,7 +49,7 @@ public class LogService {
     private final ImageInfoRepository imageInfoRepository;
     private final SpotifyMusicRepository spotifyMusicRepository;
     private final CustomMusicRepository customMusicRepository;
-    private final LogByCategoryRepository logByCategoryRepository;
+    private final LogByFilterRepository logByCategoryRepository;
 
     @Transactional
     public SaveLogResponseDto saveLog(long userId, SaveLogRequestDto requestDto, List<MultipartFile> multipartFile) {
@@ -458,9 +458,9 @@ public class LogService {
             calenderlogCountinfo.recordCount(), calenderAlbumImageInfoList);
     }
 
-    // 마이플레이리스트 필터(카테고리 활성 여부 정보)
+    // 마이플레이리스트 필터(필터 활성 여부 정보)
     @Transactional(readOnly = true)
-    public GetCategoryStatusDto getPopulatedCategories(long userId) {
+    public GetCategoryStatusDto getPopulatedFilter(long userId) {
 
         List<Feeling> feelingList = logRepository.findDistinctFeelings(userId);
         List<Time> timeList = logRepository.findDistinctTimes(userId);
@@ -555,18 +555,18 @@ public class LogService {
         return new GetCategoryStatusDto(getFeelingStatusDto, getTimeStatusDto, getWeatherStatusDto, getSeasonStatusDto);
     }
 
-    // 카테고리별 기록 개수 조회
+    // 필터별 기록 개수 조회
     @Transactional(readOnly = true)
-    public Long getRecordCountByCategory(long userId, Feeling feeling, Time time, Weather weather,
+    public Long getRecordCountByFilter(long userId, Feeling feeling, Time time, Weather weather,
                                                         Season season) {
-        return logByCategoryRepository.getRecordCountByCategory(userId, feeling, time, weather, season);
+        return logByCategoryRepository.getRecordCountByFilter(userId, feeling, time, weather, season);
     }
 
-    // 카테고리별 마이플레이리스트 조회
+    // 필터별 마이플레이리스트 조회
     @Transactional(readOnly = true)
-    public GetMyPlaylistDto getMyPlaylistByCategory(long userId, Feeling feeling, Time time, Weather weather,
+    public GetMyPlaylistDto getMyPlaylistByFilter(long userId, Feeling feeling, Time time, Weather weather,
                                                        Season season) {
-        List<Log> logList = logByCategoryRepository.getMyPlaylistByCategory(userId, feeling, time, weather, season);
+        List<Log> logList = logByCategoryRepository.getMyPlaylistByFilter(userId, feeling, time, weather, season);
 
         List<RandomMyPlaylistDto> randomMyPlaylistDtoList = new ArrayList<>();
         LocalDate minDate = LocalDate.MAX;
@@ -617,13 +617,13 @@ public class LogService {
 
         String date = formattedMinDate + " - " + formattedMaxDate;
 
-        String text = generateText(feeling, time, weather, season);
+        String text = generateFilterText(feeling, time, weather, season);
 
         return new GetMyPlaylistDto(getColor(feeling), getColor(time), getColor(weather), getColor(season),
             date, text, randomMyPlaylistDtoList);
     }
 
-    private String generateText(Feeling feeling, Time time, Weather weather, Season season) {
+    private String generateFilterText(Feeling feeling, Time time, Weather weather, Season season) {
 
         StringBuilder text = new StringBuilder();
 

@@ -9,10 +9,10 @@ import com.dnd.MusicLog.log.enums.Weather;
 import java.util.List;
 
 
-public interface LogByCategoryRepository {
+public interface LogByFilterRepository {
 
-    Long getRecordCountByCategory(long userId, Feeling feeling, Time time, Weather weather, Season season);
+    Long getRecordCountByFilter(long userId, Feeling feeling, Time time, Weather weather, Season season);
 
-    List<Log> getMyPlaylistByCategory(long userId, Feeling feeling, Time time, Weather weather, Season season);
+    List<Log> getMyPlaylistByFilter(long userId, Feeling feeling, Time time, Weather weather, Season season);
 
 }

@@ -18,12 +18,12 @@ import static com.dnd.MusicLog.log.entity.QLog.log;
 
 @Repository
 @RequiredArgsConstructor
-public class LogByCategoryRepositoryImpl implements LogByCategoryRepository {
+public class LogByFilterRepositoryImpl implements LogByFilterRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Long getRecordCountByCategory(long userId, Feeling feeling, Time time, Weather weather, Season season) {
+    public Long getRecordCountByFilter(long userId, Feeling feeling, Time time, Weather weather, Season season) {
         return jpaQueryFactory
             .select(log.count())
             .from(log)
@@ -37,7 +37,7 @@ public class LogByCategoryRepositoryImpl implements LogByCategoryRepository {
     }
 
     @Override
-    public List<Log> getMyPlaylistByCategory(long userId, Feeling feeling, Time time, Weather weather, Season season) {
+    public List<Log> getMyPlaylistByFilter(long userId, Feeling feeling, Time time, Weather weather, Season season) {
         List<Log> logList = jpaQueryFactory
             .selectFrom(log)
             .leftJoin(log.customMusic).fetchJoin()

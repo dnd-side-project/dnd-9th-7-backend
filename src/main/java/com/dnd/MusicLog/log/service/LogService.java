@@ -6,10 +6,7 @@ import com.dnd.MusicLog.imageinfo.repository.ImageInfoRepository;
 import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
 import com.dnd.MusicLog.log.dto.*;
 import com.dnd.MusicLog.log.entity.Log;
-import com.dnd.MusicLog.log.enums.Feeling;
-import com.dnd.MusicLog.log.enums.Season;
-import com.dnd.MusicLog.log.enums.Time;
-import com.dnd.MusicLog.log.enums.Weather;
+import com.dnd.MusicLog.log.enums.*;
 import com.dnd.MusicLog.log.repository.LogByCategoryRepository;
 import com.dnd.MusicLog.log.repository.LogRepository;
 import com.dnd.MusicLog.music.dto.CustomMusicRequestDto;
@@ -40,6 +37,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class LogService {
+
+    private static final String DATE_FORMAT = "yyyy.MM.dd";
 
     private final OAuthLoginService oAuthLoginService;
     private final ImageInfoService imageInfoService;
@@ -461,7 +460,7 @@ public class LogService {
 
     // 마이플레이리스트 필터(카테고리 활성 여부 정보)
     @Transactional(readOnly = true)
-    public GetCategoryStatusDto findPopulatedCategories(long userId) {
+    public GetCategoryStatusDto getPopulatedCategories(long userId) {
 
         List<Feeling> feelingList = logRepository.findDistinctFeelings(userId);
         List<Time> timeList = logRepository.findDistinctTimes(userId);
@@ -556,9 +555,128 @@ public class LogService {
         return new GetCategoryStatusDto(getFeelingStatusDto, getTimeStatusDto, getWeatherStatusDto, getSeasonStatusDto);
     }
 
+    // 카테고리별 기록 개수 조회
     @Transactional(readOnly = true)
-    public Long findRecordCountByCategory(long userId, Feeling feeling, Time time, Weather weather,
+    public Long getRecordCountByCategory(long userId, Feeling feeling, Time time, Weather weather,
                                                         Season season) {
-        return logByCategoryRepository.findRecordCountByCategory(userId, feeling, time, weather, season);
+        return logByCategoryRepository.getRecordCountByCategory(userId, feeling, time, weather, season);
+    }
+
+    // 카테고리별 마이플레이리스트 조회
+    @Transactional(readOnly = true)
+    public GetMyPlaylistDto getMyPlaylistByCategory(long userId, Feeling feeling, Time time, Weather weather,
+                                                       Season season) {
+        List<Log> logList = logByCategoryRepository.getMyPlaylistByCategory(userId, feeling, time, weather, season);
+
+        List<RandomMyPlaylistDto> randomMyPlaylistDtoList = new ArrayList<>();
+        LocalDate minDate = LocalDate.MAX;
+        LocalDate maxDate = LocalDate.MIN;
+
+        for (Log log : logList) {
+
+            List<String> artistList = new ArrayList<>();
+
+            if (log.getDate().isBefore(minDate)) {
+                minDate = log.getDate();
+            }
+
+            if (log.getDate().isAfter(maxDate)) {
+                maxDate = log.getDate();
+            }
+
+            if (log.getMusicType() == MusicType.SPOTIFY) {
+
+                SpotifyItemResponse spotifyItemResponse = spotifyMusicService.searchSpotifyTrack(log.getSpotifyMusic().getSpotifyId());
+
+                List<SpotifyArtistResponse> artists = spotifyItemResponse.artists();
+                for (SpotifyArtistResponse artist: artists) {
+                    artistList.add(artist.name());
+                }
+
+                RandomMyPlaylistDto randomMyPlaylistDto = new RandomMyPlaylistDto(log.getSpotifyMusic().getAlbum().getImageUrl(),
+                    artistList, log.getSpotifyMusic().getName());
+
+                randomMyPlaylistDtoList.add(randomMyPlaylistDto);
+            }
+
+            if (log.getMusicType() == MusicType.CUSTOM) {
+
+                artistList.add(log.getCustomMusic().getArtist());
+                RandomMyPlaylistDto randomMyPlaylistDto = new RandomMyPlaylistDto(log.getCustomMusic().getImageUrl(),
+                    artistList, log.getCustomMusic().getName());
+
+                randomMyPlaylistDtoList.add(randomMyPlaylistDto);
+
+            }
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+
+        String formattedMinDate = minDate.format(formatter);
+        String formattedMaxDate = maxDate.format(formatter);
+
+        String date = formattedMinDate + " - " + formattedMaxDate;
+
+        String text = generateText(feeling, time, weather, season);
+
+        return new GetMyPlaylistDto(getColor(feeling), getColor(time), getColor(weather), getColor(season),
+            date, text, randomMyPlaylistDtoList);
+    }
+
+    private String generateText(Feeling feeling, Time time, Weather weather, Season season) {
+
+        StringBuilder text = new StringBuilder();
+
+        if (feeling != null) {
+            text.append(feeling.getStatus());
+            if (weather != null) {
+                if (feeling == Feeling.EXCITEMENT || feeling == Feeling.FLUTTER || feeling == Feeling.EMPTINESS) {
+                    text.deleteCharAt(text.length() - 1);
+                    text.append("고");
+                } else {
+                    text.deleteCharAt(text.length() - 1);
+                    text.append("하고");
+                }
+
+            }
+            if (weather == null && season == null && time == null){
+                text.append(" 날");
+            }
+
+            text.append(" ");
+        }
+
+        if (weather != null) {
+            text.append(weather.getStatus());
+
+            if (season == null && time == null){
+                text.append(" 날");
+            }
+            text.append(" ");
+        }
+
+        if (season != null) {
+            text.append(season.getStatus());
+
+            if (time == null){
+                text.append("에");
+            }
+
+            text.append(" ");
+        }
+
+        if (time != null) {
+            text.append(time.getStatus());
+            text.append("에 ");
+
+        }
+
+        text.append("기록한 음악");
+
+        return text.toString();
+    }
+
+    private String getColor(Category category){
+        return category!=null ? category.getColor() : null;
     }
 }

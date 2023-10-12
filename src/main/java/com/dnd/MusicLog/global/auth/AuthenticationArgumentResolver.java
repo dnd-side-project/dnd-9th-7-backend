@@ -18,15 +18,15 @@ public class AuthenticationArgumentResolver implements HandlerMethodArgumentReso
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(AuthenticationPrincipal.class);
+        return parameter.hasParameterAnnotation(PrincipalId.class);
     }
 
     @Override
-    public Object resolveArgument(
+    public Long resolveArgument(
         MethodParameter parameter,
         ModelAndViewContainer mavContainer,
         NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         String bearerToken = authenticationExtractor.extract(webRequest);
-        return jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        return Long.valueOf(jwtTokenProvider.extractAccessTokenSubject(bearerToken));
     }
 }

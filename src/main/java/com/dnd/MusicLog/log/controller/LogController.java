@@ -164,19 +164,19 @@ public class LogController extends BaseController {
     }
 
     @GetMapping("/myplaylist")
-    public ResponseEntity<BaseResponse<GetCategoryStatusDto>> findPopulatedCategories(
+    public ResponseEntity<BaseResponse<GetCategoryStatusDto>> getPopulatedCategories(
         @RequestHeader(name = "Authorization") String bearerToken) {
 
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);
 
-        GetCategoryStatusDto responseDto = logService.findPopulatedCategories(userId);
+        GetCategoryStatusDto responseDto = logService.getPopulatedCategories(userId);
         return createBaseResponse(HttpStatus.OK, "카테고리 활성화 여부 조회 완료", responseDto);
 
     }
 
     @GetMapping("/myplaylist/category")
-    public ResponseEntity<BaseResponse<Long>> findPopulatedCategories(
+    public ResponseEntity<BaseResponse<Long>> getRecordCountByCategory(
         @RequestHeader(name = "Authorization", required = false) String bearerToken,
         @RequestParam(name = "feeling", required = false) Feeling feeling,
         @RequestParam(name = "time", required = false) Time time,
@@ -187,8 +187,25 @@ public class LogController extends BaseController {
         String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
         long userId = Long.parseLong(subject);
 
-        long responseDto = logService.findRecordCountByCategory(userId, feeling, time, weather, season);
+        long responseDto = logService.getRecordCountByCategory(userId, feeling, time, weather, season);
         return createBaseResponse(HttpStatus.OK, "카테고리별 기록 개수 조회 완료", responseDto);
+
+    }
+
+    @GetMapping("/myplaylist/category/result")
+    public ResponseEntity<BaseResponse<GetMyPlaylistDto>> getMyPlaylistByCategory(
+        @RequestHeader(name = "Authorization", required = false) String bearerToken,
+        @RequestParam(name = "feeling", required = false) Feeling feeling,
+        @RequestParam(name = "time", required = false) Time time,
+        @RequestParam(name = "weather", required = false) Weather weather,
+        @RequestParam(name = "season", required = false) Season season
+    ) {
+
+        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
+        long userId = Long.parseLong(subject);
+
+        GetMyPlaylistDto responseDto = logService.getMyPlaylistByCategory(userId, feeling, time, weather, season);
+        return createBaseResponse(HttpStatus.OK, "마이플레이리스트 필터 결과 조회 완료", responseDto);
 
     }
 

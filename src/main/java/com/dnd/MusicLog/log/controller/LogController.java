@@ -1,9 +1,9 @@
 package com.dnd.MusicLog.log.controller;
 
+import com.dnd.MusicLog.global.auth.PrincipalId;
 import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
 import com.dnd.MusicLog.global.common.SuccessResponse;
-import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.log.dto.GetFullLogResponseDto;
 import com.dnd.MusicLog.log.dto.GetLogMusicResponseDto;
 import com.dnd.MusicLog.log.dto.GetLogPlayResponseDto;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,106 +31,72 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class LogController extends BaseController {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final LogService logService;
 
     @PostMapping("")
-    public ResponseEntity<BaseResponse<SaveLogResponseDto>> saveLog(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<BaseResponse<SaveLogResponseDto>> saveLog(
+        @PrincipalId long userId,
         @RequestPart("images") List<MultipartFile> multipartFile,
         @RequestPart("saveLogRequestDto") SaveLogRequestDto requestDto) {
-
-        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        long userId = Long.parseLong(subject);
-
         SaveLogResponseDto responseDto = logService.saveLog(userId, requestDto, multipartFile);
         return createBaseResponse(HttpStatus.CREATED, "로그 저장 완료", responseDto);
 
     }
 
     @PutMapping("/{logId}")
-    public ResponseEntity<SuccessResponse> updateLog(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<SuccessResponse> updateLog(
+        @PrincipalId long userId,
         @RequestPart("images") List<MultipartFile> multipartFile,
         @RequestPart("saveLogRequestDto") SaveLogRequestDto requestDto,
         @PathVariable(name = "logId") long logId) {
-
-        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        long userId = Long.parseLong(subject);
-
         logService.updateLog(userId, logId, requestDto, multipartFile);
         return createSuccessResponse(HttpStatus.OK, "로그 수정 완료");
-
     }
 
     @DeleteMapping("/{logId}")
-    public ResponseEntity<SuccessResponse> deleteLog(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<SuccessResponse> deleteLog(
+        @PrincipalId long userId,
         @PathVariable(name = "logId") long logId) {
-
-        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        long userId = Long.parseLong(subject);
-
         logService.deleteLog(userId, logId);
         return createSuccessResponse(HttpStatus.OK, "로그 삭제 완료");
-
     }
 
     @GetMapping("/{logId}/music")
-    public ResponseEntity<BaseResponse<GetLogMusicResponseDto>> getLogMusic(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<BaseResponse<GetLogMusicResponseDto>> getLogMusic(
+        @PrincipalId long userId,
         @PathVariable(name = "logId") long logId) {
-
-        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        long userId = Long.parseLong(subject);
-
         GetLogMusicResponseDto responseDto = logService.getLogMusic(userId, logId);
         return createBaseResponse(HttpStatus.OK, "로그(MUSIC 정보) 조회 완료", responseDto);
-
     }
 
     @GetMapping("/{logId}/record")
-    public ResponseEntity<BaseResponse<GetLogRecordResponseDto>> getLogRecord(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<BaseResponse<GetLogRecordResponseDto>> getLogRecord(
+        @PrincipalId long userId,
         @PathVariable(name = "logId") long logId) {
-
-        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        long userId = Long.parseLong(subject);
-
         GetLogRecordResponseDto responseDto = logService.getLogRecord(userId, logId);
         return createBaseResponse(HttpStatus.OK, "로그(RECORD 정보) 조회 완료", responseDto);
-
     }
 
     @GetMapping("/{logId}/play")
-    public ResponseEntity<BaseResponse<GetLogPlayResponseDto>> getLogPlay(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<BaseResponse<GetLogPlayResponseDto>> getLogPlay(
+        @PrincipalId long userId,
         @PathVariable(name = "logId") long logId) {
-
-        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        long userId = Long.parseLong(subject);
-
         GetLogPlayResponseDto responseDto = logService.getLogPlay(userId, logId);
         return createBaseResponse(HttpStatus.OK, "로그(PLAY 정보) 조회 완료", responseDto);
-
     }
 
     @GetMapping("/{logId}")
-    public ResponseEntity<BaseResponse<GetFullLogResponseDto>> getFullLog(@RequestHeader(name = "Authorization") String bearerToken,
+    public ResponseEntity<BaseResponse<GetFullLogResponseDto>> getFullLog(
+        @PrincipalId long userId,
         @PathVariable(name = "logId") long logId) {
-
-        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        long userId = Long.parseLong(subject);
-
         GetFullLogResponseDto responseDto = logService.getFullLog(userId, logId);
         return createBaseResponse(HttpStatus.OK, "로그 전체 정보 조회 완료", responseDto);
-
     }
 
     @GetMapping("/temp")
     public ResponseEntity<BaseResponse<GetTempLogMusicInfoListResponseDto>> getTempLogs(
-        @RequestHeader(name = "Authorization") String bearerToken) {
-
-        String subject = jwtTokenProvider.extractAccessTokenSubject(bearerToken);
-        long userId = Long.parseLong(subject);
-
+        @PrincipalId long userId) {
         GetTempLogMusicInfoListResponseDto responseDto = logService.getTempLogs(userId);
         return createBaseResponse(HttpStatus.OK, "임시저장 로그 정보 조회 완료", responseDto);
-
     }
-
 }

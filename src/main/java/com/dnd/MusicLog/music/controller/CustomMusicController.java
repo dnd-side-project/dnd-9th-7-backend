@@ -1,8 +1,8 @@
 package com.dnd.MusicLog.music.controller;
 
+import com.dnd.MusicLog.global.auth.PrincipalId;
 import com.dnd.MusicLog.global.common.BaseController;
 import com.dnd.MusicLog.global.common.BaseResponse;
-import com.dnd.MusicLog.global.jwt.util.JwtTokenProvider;
 import com.dnd.MusicLog.music.dto.CustomMusicItem;
 import com.dnd.MusicLog.music.dto.CustomMusicRequestDto;
 import com.dnd.MusicLog.music.dto.CustomMusicResponseDto;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,17 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CustomMusicController extends BaseController {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final CustomMusicService customMusicService;
 
     @GetMapping("")
     public ResponseEntity<BaseResponse<SearchCustomMusicResponseDto>> searchCustomMusic(
-        @RequestHeader(name = "Authorization") String token,
+        @PrincipalId long userId,
         @RequestParam(value = "query") String query,
         @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
         @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
-        String subject = jwtTokenProvider.extractAccessTokenSubject(token);
-
         SearchCustomMusicResponseDto response =
             customMusicService.searchCustomMusic(query, offset, size);
 
@@ -46,11 +42,8 @@ public class CustomMusicController extends BaseController {
 
     @GetMapping("/{customMusicId}")
     public ResponseEntity<BaseResponse<CustomMusicItem>> searchCustomMusic(
-        @RequestHeader(name = "Authorization") String token,
+        @PrincipalId long userId,
         @PathVariable(name = "customMusicId") long customMusicId) {
-        String subject = jwtTokenProvider.extractAccessTokenSubject(token);
-        long userId = Long.parseLong(subject);
-
         CustomMusicItem response = customMusicService.searchCustomMusic(customMusicId);
 
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 검색 성공", response);
@@ -58,11 +51,8 @@ public class CustomMusicController extends BaseController {
 
     @PostMapping("")
     public ResponseEntity<BaseResponse<CustomMusicResponseDto>> saveCustomMusic(
-        @RequestHeader(name = "Authorization") String token,
+        @PrincipalId long userId,
         @RequestBody CustomMusicRequestDto customMusicRequestDto) {
-        String subject = jwtTokenProvider.extractAccessTokenSubject(token);
-        long userId = Long.parseLong(subject);
-
         CustomMusicResponseDto responseDto = customMusicService.saveCustomMusic(customMusicRequestDto);
 
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 저장 완료", responseDto);
@@ -70,12 +60,9 @@ public class CustomMusicController extends BaseController {
 
     @PutMapping("/{customMusicId}")
     public ResponseEntity<BaseResponse<CustomMusicResponseDto>> updateCustomMusic(
-        @RequestHeader(name = "Authorization") String token,
+        @PrincipalId long userId,
         @PathVariable(name = "customMusicId") long customMusicId,
         @RequestBody CustomMusicRequestDto customMusicRequestDto) {
-        String subject = jwtTokenProvider.extractAccessTokenSubject(token);
-        long userId = Long.parseLong(subject);
-
         CustomMusicResponseDto response =
             customMusicService.updateCustomMusic(customMusicId, customMusicRequestDto);
 
@@ -84,11 +71,8 @@ public class CustomMusicController extends BaseController {
 
     @DeleteMapping("/{customMusicId}")
     public ResponseEntity<BaseResponse<CustomMusicResponseDto>> deleteCustomMusic(
-        @RequestHeader(name = "Authorization") String token,
+        @PrincipalId long userId,
         @PathVariable(name = "customMusicId") long customMusicId) {
-        String subject = jwtTokenProvider.extractAccessTokenSubject(token);
-        long userId = Long.parseLong(subject);
-
         CustomMusicResponseDto response = customMusicService.deleteCustomMusic(customMusicId);
 
         return createBaseResponse(HttpStatus.OK, "커스텀 음악 삭제 완료", response);

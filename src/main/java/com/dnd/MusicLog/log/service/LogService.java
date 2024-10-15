@@ -6,6 +6,8 @@ import com.dnd.MusicLog.imageinfo.repository.ImageInfoRepository;
 import com.dnd.MusicLog.imageinfo.service.ImageInfoService;
 import com.dnd.MusicLog.log.dto.*;
 import com.dnd.MusicLog.log.entity.Log;
+import com.dnd.MusicLog.log.enums.*;
+import com.dnd.MusicLog.log.repository.LogByFilterRepository;
 import com.dnd.MusicLog.log.repository.LogRepository;
 import com.dnd.MusicLog.music.dto.CustomMusicRequestDto;
 import com.dnd.MusicLog.music.dto.CustomMusicResponseDto;
@@ -36,6 +38,8 @@ import java.util.List;
 @Service
 public class LogService {
 
+    private static final String DATE_FORMAT = "yyyy.MM.dd";
+
     private final OAuthLoginService oAuthLoginService;
     private final ImageInfoService imageInfoService;
     private final YoutubeInfoService youtubeInfoService;
@@ -45,6 +49,7 @@ public class LogService {
     private final ImageInfoRepository imageInfoRepository;
     private final SpotifyMusicRepository spotifyMusicRepository;
     private final CustomMusicRepository customMusicRepository;
+    private final LogByFilterRepository logByCategoryRepository;
 
     @Transactional
     public SaveLogResponseDto saveLog(long userId, SaveLogRequestDto requestDto, List<MultipartFile> multipartFile) {
@@ -451,5 +456,227 @@ public class LogService {
 
         return new MonthLogInfo(localDate.getYear(), localDate.getMonthValue(), calenderlogCountinfo.dayCount(),
             calenderlogCountinfo.recordCount(), calenderAlbumImageInfoList);
+    }
+
+    // 마이플레이리스트 필터(필터 활성 여부 정보)
+    @Transactional(readOnly = true)
+    public GetCategoryStatusDto getPopulatedFilter(long userId) {
+
+        List<Feeling> feelingList = logRepository.findDistinctFeelings(userId);
+        List<Time> timeList = logRepository.findDistinctTimes(userId);
+        List<Weather> weatherList = logRepository.findDistinctWeathers(userId);
+        List<Season> seasonList = logRepository.findDistinctSeasons(userId);
+
+        GetFeelingStatusDto getFeelingStatusDto = new GetFeelingStatusDto();
+        GetTimeStatusDto getTimeStatusDto = new GetTimeStatusDto();
+        GetWeatherStatusDto getWeatherStatusDto = new GetWeatherStatusDto();
+        GetSeasonStatusDto getSeasonStatusDto = new GetSeasonStatusDto();
+
+
+        for (Feeling feeling : feelingList) {
+            switch (feeling.name()) {
+                case "HAPPINESS":
+                    getFeelingStatusDto.setHAPPINESS(true);
+                    break;
+                case "EXCITEMENT":
+                    getFeelingStatusDto.setEXCITEMENT(true);
+                    break;
+                case "FLUTTER":
+                    getFeelingStatusDto.setFLUTTER(true);
+                    break;
+                case "SERENITY":
+                    getFeelingStatusDto.setSERENITY(true);
+                    break;
+                case "EMPTINESS":
+                    getFeelingStatusDto.setEMPTINESS(true);
+                    break;
+                case "DEPRESSION":
+                    getFeelingStatusDto.setDEPRESSION(true);
+                    break;
+                case "SADNESS":
+                    getFeelingStatusDto.setSADNESS(true);
+                    break;
+                case "ANGER":
+                    getFeelingStatusDto.setANGER(true);
+                    break;
+            }
+        }
+
+        for (Time time : timeList) {
+            switch (time.name()) {
+                case "MORNING":
+                    getTimeStatusDto.setMORNING(true);
+                    break;
+                case "LUNCH":
+                    getTimeStatusDto.setLUNCH(true);
+                    break;
+                case "DINNER":
+                    getTimeStatusDto.setDINNER(true);
+                    break;
+                case "DAWN":
+                    getTimeStatusDto.setDAWN(true);
+                    break;
+            }
+        }
+
+        for (Weather weather : weatherList) {
+            switch (weather.name()) {
+                case "SUNNY":
+                    getWeatherStatusDto.setSUNNY(true);
+                    break;
+                case "CLOUDY":
+                    getWeatherStatusDto.setCLOUDY(true);
+                    break;
+                case "RAIN":
+                    getWeatherStatusDto.setRAIN(true);
+                    break;
+                case "SNOW":
+                    getWeatherStatusDto.setSNOW(true);
+                    break;
+            }
+        }
+
+        for (Season season : seasonList) {
+            switch (season.name()) {
+                case "SPRING":
+                    getSeasonStatusDto.setSPRING(true);
+                    break;
+                case "SUMMER":
+                    getSeasonStatusDto.setSUMMER(true);
+                    break;
+                case "AUTUMN":
+                    getSeasonStatusDto.setAUTUMN(true);
+                    break;
+                case "WINTER":
+                    getSeasonStatusDto.setWINTER(true);
+                    break;
+            }
+        }
+        return new GetCategoryStatusDto(getFeelingStatusDto, getTimeStatusDto, getWeatherStatusDto, getSeasonStatusDto);
+    }
+
+    // 필터별 기록 개수 조회
+    @Transactional(readOnly = true)
+    public Long getRecordCountByFilter(long userId, Feeling feeling, Time time, Weather weather,
+                                                        Season season) {
+        return logByCategoryRepository.getRecordCountByFilter(userId, feeling, time, weather, season);
+    }
+
+    // 필터별 마이플레이리스트 조회
+    @Transactional(readOnly = true)
+    public GetMyPlaylistDto getMyPlaylistByFilter(long userId, Feeling feeling, Time time, Weather weather,
+                                                       Season season) {
+        List<Log> logList = logByCategoryRepository.getMyPlaylistByFilter(userId, feeling, time, weather, season);
+
+        List<RandomMyPlaylistDto> randomMyPlaylistDtoList = new ArrayList<>();
+        LocalDate minDate = LocalDate.MAX;
+        LocalDate maxDate = LocalDate.MIN;
+
+        for (Log log : logList) {
+
+            List<String> artistList = new ArrayList<>();
+
+            if (log.getDate().isBefore(minDate)) {
+                minDate = log.getDate();
+            }
+
+            if (log.getDate().isAfter(maxDate)) {
+                maxDate = log.getDate();
+            }
+
+            if (log.getMusicType() == MusicType.SPOTIFY) {
+
+                SpotifyItemResponse spotifyItemResponse = spotifyMusicService.searchSpotifyTrack(log.getSpotifyMusic().getSpotifyId());
+
+                List<SpotifyArtistResponse> artists = spotifyItemResponse.artists();
+                for (SpotifyArtistResponse artist: artists) {
+                    artistList.add(artist.name());
+                }
+
+                RandomMyPlaylistDto randomMyPlaylistDto = new RandomMyPlaylistDto(log.getSpotifyMusic().getAlbum().getImageUrl(),
+                    artistList, log.getSpotifyMusic().getName());
+
+                randomMyPlaylistDtoList.add(randomMyPlaylistDto);
+            }
+
+            if (log.getMusicType() == MusicType.CUSTOM) {
+
+                artistList.add(log.getCustomMusic().getArtist());
+                RandomMyPlaylistDto randomMyPlaylistDto = new RandomMyPlaylistDto(log.getCustomMusic().getImageUrl(),
+                    artistList, log.getCustomMusic().getName());
+
+                randomMyPlaylistDtoList.add(randomMyPlaylistDto);
+
+            }
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+
+        String formattedMinDate = minDate.format(formatter);
+        String formattedMaxDate = maxDate.format(formatter);
+
+        String date = formattedMinDate + " - " + formattedMaxDate;
+
+        String text = generateFilterText(feeling, time, weather, season);
+
+        return new GetMyPlaylistDto(getColor(feeling), getColor(time), getColor(weather), getColor(season),
+            date, text, randomMyPlaylistDtoList);
+    }
+
+    private String generateFilterText(Feeling feeling, Time time, Weather weather, Season season) {
+
+        StringBuilder text = new StringBuilder();
+
+        if (feeling != null) {
+            text.append(feeling.getStatus());
+            if (weather != null) {
+                if (feeling == Feeling.EXCITEMENT || feeling == Feeling.FLUTTER || feeling == Feeling.EMPTINESS) {
+                    text.deleteCharAt(text.length() - 1);
+                    text.append("고");
+                } else {
+                    text.deleteCharAt(text.length() - 1);
+                    text.append("하고");
+                }
+
+            }
+            if (weather == null && season == null && time == null){
+                text.append(" 날");
+            }
+
+            text.append(" ");
+        }
+
+        if (weather != null) {
+            text.append(weather.getStatus());
+
+            if (season == null && time == null){
+                text.append(" 날");
+            }
+            text.append(" ");
+        }
+
+        if (season != null) {
+            text.append(season.getStatus());
+
+            if (time == null){
+                text.append("에");
+            }
+
+            text.append(" ");
+        }
+
+        if (time != null) {
+            text.append(time.getStatus());
+            text.append("에 ");
+
+        }
+
+        text.append("기록한 음악");
+
+        return text.toString();
+    }
+
+    private String getColor(Category category){
+        return category!=null ? category.getColor() : null;
     }
 }

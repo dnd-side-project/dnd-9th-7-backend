@@ -7,12 +7,13 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum Weather {
+public enum Weather implements Category{
 
-    SUNNY("59FFCD"),
-    CLOUDY("5897AC"),
-    RAIN("128A92"),
-    SNOW("ACF2E6");
+    SUNNY("맑은", "59FFCD"),
+    CLOUDY("흐린", "5897AC"),
+    RAIN("비오는", "128A92"),
+    SNOW("눈오는", "ACF2E6");
 
+    private String status;
     private String color;
 }

@@ -1,6 +1,10 @@
 package com.dnd.MusicLog.log.repository;
 
 import com.dnd.MusicLog.log.entity.Log;
+import com.dnd.MusicLog.log.enums.Feeling;
+import com.dnd.MusicLog.log.enums.Season;
+import com.dnd.MusicLog.log.enums.Time;
+import com.dnd.MusicLog.log.enums.Weather;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -56,4 +60,17 @@ public interface LogRepository extends JpaRepository<Log, Long> {
     @Query(value = "UPDATE log l SET l.representation = CASE WHEN l.id = :logId THEN true ELSE false END WHERE l.user_id = :userId " +
         "AND l.temp = false AND YEAR(l.date) = YEAR(:date) AND MONTH(l.date) = MONTH(:date) AND DAY(l.date) = DAY(:date)", nativeQuery = true)
     void updateRepresentationImage(@Param("userId") long userId, @Param("date") LocalDate date, @Param("logId") long logId);
+
+    @Query("SELECT DISTINCT l.feeling FROM Log l WHERE l.user.id = :userId AND l.temp = false")
+    List<Feeling> findDistinctFeelings(@Param("userId") long userId);
+
+    @Query("SELECT DISTINCT l.time FROM Log l WHERE l.user.id = :userId AND l.temp = false")
+    List<Time> findDistinctTimes(@Param("userId") long userId);
+
+    @Query("SELECT DISTINCT l.weather FROM Log l WHERE l.user.id = :userId AND l.temp = false")
+    List<Weather> findDistinctWeathers(@Param("userId") long userId);
+
+    @Query("SELECT DISTINCT l.season FROM Log l WHERE l.user.id = :userId AND l.temp = false")
+    List<Season> findDistinctSeasons(@Param("userId") long userId);
+
 }
